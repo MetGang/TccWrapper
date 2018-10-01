@@ -1,2 +1,3 @@
 # TccWrapper
-Convenient C++ wrapper for use with embedded Tiny C Compiler
+
+Convenient header-only C++ wrapper for use with embedded Tiny C Compiler
