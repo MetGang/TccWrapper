@@ -115,7 +115,7 @@ namespace tw
             tcc_set_error_func(m_state, userData, function);
         }
 
-        /// Creates tcc compilation context, return true on success
+        /// Creates tcc compilation context, returns true on success
         bool CreateContext()
         {
             m_state = tcc_new();
