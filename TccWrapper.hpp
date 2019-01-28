@@ -6,7 +6,7 @@
 
     Macros:
     * TW_USE_OPTIONAL
-    * TW_ALLOW_EXCEPTIONS
+    * TW_USE_EXCEPTIONS
 
 */
 
@@ -16,9 +16,9 @@
 #ifdef TW_USE_OPTIONAL
 #include <optional>
 #endif // TW_USE_OPTIONAL
-#ifdef TW_ALLOW_EXCEPTIONS
+#ifdef TW_USE_EXCEPTIONS
 #include <stdexcept>
-#endif // TW_ALLOW_EXCEPTIONS
+#endif // TW_USE_EXCEPTIONS
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -246,7 +246,7 @@ namespace tw
             M_RegisterMethod<MethodPtr>(name, std::make_index_sequence<Traits_t::arity>{});
         }
 
-        #ifdef TW_ALLOW_EXCEPTIONS
+        #ifdef TW_USE_EXCEPTIONS
 
         /// Tries to call function with given args, throws if no such function symbol exists
         template <typename Ret, typename... Args>
@@ -264,7 +264,7 @@ namespace tw
             }
         }
 
-        #endif // TW_ALLOW_EXCEPTIONS
+        #endif // TW_USE_EXCEPTIONS
 
         /// Tries to call function with given args, returns true on success
         template <typename Ret, typename... Args>
