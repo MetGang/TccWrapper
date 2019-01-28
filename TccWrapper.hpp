@@ -19,15 +19,38 @@
 #if !defined(TW_PROHIBIT_EXCEPTIONS)
 #include <stdexcept>
 #endif // TW_PROHIBIT_EXCEPTIONS
+#include <tuple>
 #include <type_traits>
-
-#include <iostream>
+#include <utility>
 
 // tcc
 #include "libtcc.h"
 
 namespace tw
 {
+    namespace detail
+    {
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraitsBase
+        {
+            using Class_t  = Class;
+            using Return_t = Ret;
+            using Args_t   = std::tuple<Args...>;
+            template <size_t N>
+            using NthArg_t = std::tuple_element_t<N, Args_t>;
+
+            inline static constexpr auto arity = sizeof...(Args);
+        };
+
+        template <typename>
+        class MethodTraits;
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...)> : MethodTraitsBase<Class, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const> : MethodTraitsBase<const Class, Ret, Args...> {};
+    }
 
     /// Enumeration that specifies how code will be compiled
     enum class OutputType : int32_t
@@ -43,7 +66,7 @@ namespace tw
     {
     public:
 
-        /// Initialize tcc state to nullptr
+        /// Initializes tcc state to nullptr
         TccWrapper() = default;
 
         /// Deleted copy-ctor
@@ -52,14 +75,14 @@ namespace tw
         /// Deleted copy-assign-op
         TccWrapper& operator = (const TccWrapper&) = delete;
 
-        /// Move state from the rhs
+        /// Moves state from the rhs
         TccWrapper(TccWrapper&& rhs)
             : m_state { rhs.m_state }
         {
             rhs.m_state = nullptr;
         }
 
-        /// Move state from the rhs and delete current if possible
+        /// Moves state from the rhs and deletes current if possible
         TccWrapper& operator = (TccWrapper&& rhs)
         {
             if (this != &rhs)
@@ -77,7 +100,7 @@ namespace tw
             return *this;
         }
 
-        /// Destroy tcc state if possible
+        /// Destroys tcc state if possible
         ~TccWrapper()
         {
             if (m_state)
@@ -86,13 +109,13 @@ namespace tw
             }
         }
 
-        /// Set callback for printing error messages (void* for userData, const char* for message)
+        /// Sets callback for printing error messages (void* for userData, const char* for message)
         void SetErrorCallback(void* userData, void (*function)(void*, const char*))
         {
             tcc_set_error_func(m_state, userData, function);
         }
 
-        /// Create tcc compilation context, return true on success
+        /// Creates tcc compilation context, return true on success
         bool CreateContext()
         {
             m_state = tcc_new();
@@ -100,85 +123,85 @@ namespace tw
             return m_state;
         }
 
-        /// Set compilation output to the one of { Dll, Executable, Memory, Object }
+        /// Sets compilation output to the one of { Dll, Executable, Memory, Object }
         void SetOutputType(OutputType outputType)
         {
             tcc_set_output_type(m_state, static_cast<int>(outputType));
         }
 
-        /// Set options as from command line
+        /// Sets options as from command line
         void SetOptions(const char* options)
         {
             tcc_set_options(m_state, options);
         }
 
-        /// Add include path (as with -Ipath)
+        /// Adds include path (as with -Ipath)
         void AddIncludePath(const char* path) const
         {
             tcc_add_include_path(m_state, path);
         }
 
-        /// Add system include path (as with -isystem path)
+        /// Adds system include path (as with -isystem path)
         void AddSystemIncludePath(const char* path) const
         {
             tcc_add_sysinclude_path(m_state, path);
         }
 
-        /// Add library path (as with -Lpath)
+        /// Adds library path (as with -Lpath)
         void AddLibraryPath(const char* path) const
         {
             tcc_add_library_path(m_state, path);
         }
 
-        /// Add library (as with -lname)
+        /// Adds library (as with -lname)
         void AddLibrary(const char* name) const
         {
             tcc_add_library(m_state, name);
         }
 
-        /// Add file { C file, dll, object, library, ld script } for compilation, return true on success
+        /// Adds file { C file, dll, object, library, ld script } for compilation, returns true on success
         bool AddFile(const char* path) const
         {
             return tcc_add_file(m_state, path) != -1;
         }
 
-        /// Add string containing C source for compilation, return true on success
+        /// Adds string containing C source for compilation, returns true on success
         bool AddSourceCode(const char* src)
         {
             return tcc_compile_string(m_state, src) != -1;
         }
 
-        /// Compile code to auto-managed memory
+        /// Compiles code to auto-managed memory
         bool CompileToMemory() const
         {
-            return tcc_relocate(m_state, TCC_RELOCATE_AUTO) != -1;
+            return tcc_relocate(m_state, reinterpret_cast<void*>(1)) != -1;
         }
 
-        /// Define symbol with given name and (optional) value (as with #define name value)
+        /// Defines symbol with given name and (optional) value (as with #define name value)
         void Define(const char* name, const char* value = nullptr) const
         {
             tcc_define_symbol(m_state, name, value);
         }
 
-        /// Undefine symbol with given name (as with #undef name)
+        /// Undefines symbol with given name (as with #undef name)
         void Undefine(const char* name) const
         {
             tcc_undefine_symbol(m_state, name);
         }
 
-        /// Add symbol with given name
+        /// Adds symbol with given name
         void AddSymbol(const char* name, const void* symbol) const
         {
             tcc_add_symbol(m_state, name, symbol);
         }
 
-        /// Return void pointer to symbol with given name or nullptr if no such symbol exists
+        /// Returns void pointer to symbol with given name or nullptr if no such symbol exists
         void* GetSymbol(const char* name) const
         {
             return tcc_get_symbol(m_state, name);
         }
 
-        /// Return T pointer to symbol with given name or nullptr if no such symbol exists
+        /// Returns T pointer to symbol with given name or nullptr if no such symbol exists
         template <typename T>
         auto GetSymbolAs(const char* name) const
         {
@@ -194,22 +217,38 @@ namespace tw
             }
         }
 
-        /// Check whether symbol with given name exists
+        /// Checks whether symbol with given name exists
         bool HasSymbol(const char* name) const
         {
             return GetSymbol(name) != nullptr;
         }
 
-        /// Register symbol as free function with given name, won't override if called multiple times
+        /// Registers symbol from parameter as free function with given name, won't override if called multiple times
         template <typename Ret, typename... Args>
         void RegisterFunction(const char* name, Ret (*function)(Args...)) const
         {
             tcc_add_symbol(m_state, name, reinterpret_cast<const void*>(function));
         }
 
-        #if !defined(TW_PROHIBIT_EXCEPTIONS)
+        /// Registers symbol as free function with given name, won't override if called multiple times
+        template <auto FunctionPtr>
+        void RegisterFunction(const char* name) const
+        {
+            tcc_add_symbol(m_state, name, reinterpret_cast<const void*>(FunctionPtr));
+        }
 
-        /// Try to call function with given args, throw if no such function symbol exists
+        /// Registers symbol as class method with given name, won't override if called multiple times
+        template <auto MethodPtr>
+        void RegisterMethod(const char* name) const
+        {
+            using Traits_t = detail::MethodTraits<decltype(MethodPtr)>;
+
+            M_RegisterMethod<MethodPtr>(name, std::make_index_sequence<Traits_t::arity>{});
+        }
+
+        #ifndef TW_PROHIBIT_EXCEPTIONS
+
+        /// Tries to call function with given args, throws if no such function symbol exists
         template <typename Ret, typename... Args>
         Ret Call(const char* name, Args&&... args) const
         {
@@ -227,7 +266,7 @@ namespace tw
 
         #endif // TW_PROHIBIT_EXCEPTIONS
 
-        /// Try to call function with given args, return true on success
+        /// Tries to call function with given args, returns true on success
         template <typename Ret, typename... Args>
         bool CallSafely(const char* name, Ret& output, Args&&... args) const
         {
@@ -245,9 +284,9 @@ namespace tw
             }
         }
 
-        #if defined(TW_USE_OPTIONAL)
+        #ifdef TW_USE_OPTIONAL
 
-        /// Try to call function with given args, return optional with call result
+        /// Tries to call function with given args, returns optional with call result
         template <typename Ret, typename... Args>
         std::optional<Ret> CallSafelyOpt(const char* name, Args&&... args) const
         {
@@ -267,7 +306,19 @@ namespace tw
 
     private:
 
+        /// Internal helper for RegisterMethod method
+        template <auto MethodPtr, size_t... Is>
+        void M_RegisterMethod(const char* name, std::index_sequence<Is...>) const
+        {
+            using Traits_t = detail::MethodTraits<decltype(MethodPtr)>;
+
+            auto function = +[](typename Traits_t::Class_t* ptr, typename Traits_t::template NthArg_t<Is>... args) -> typename Traits_t::Return_t {
+                return (ptr->*MethodPtr)(std::forward<decltype(args)>(args)...);
+            };
+
+            RegisterFunction(name, function);
+        }
+
         TCCState* m_state = nullptr; ///< Internal state on which tcc operates
     };
-
 }
