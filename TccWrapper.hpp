@@ -174,7 +174,7 @@ namespace tw
         /// Compiles code to auto-managed memory
         bool CompileToMemory() const
         {
-            return tcc_relocate(m_state, reinterpret_cast<void*>(1)) != -1;
+            return tcc_relocate(m_state, TCC_RELOCATE_AUTO) != -1;
         }
 
         /// Defines symbol with given name and (optional) value (as with #define name value)
