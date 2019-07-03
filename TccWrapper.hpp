@@ -189,6 +189,38 @@ namespace tw
 
         template <typename Class, typename Ret, typename... Args>
         struct MethodTraits<Ret(Class::*)(Args..., ...) const volatile&& noexcept> : MethodTraitsBase<Class, Class const volatile&&, Ret, Args...> {};
+
+        template <typename M, M vMethodPtr, size_t... Is>
+        constexpr auto AsFreeFunction(std::index_sequence<Is...>)
+        {
+            using Traits_t = detail::MethodTraits<M>;
+
+            using PureClass_t = typename Traits_t::PureClass_t;
+            using Class_t     = typename Traits_t::Class_t;
+            using Return_t    = typename Traits_t::Return_t;
+
+            auto function = +[](PureClass_t* ptr, typename Traits_t::template NthArg_t<Is>... args) -> Return_t {
+                return (std::forward<Class_t>(*ptr).*vMethodPtr)(std::forward<decltype(args)>(args)...);
+            };
+
+            return function;
+        }
+    }
+
+    ///
+    template <typename M, M vMethodPtr>
+    constexpr auto AsFreeFunction()
+    {
+        using Traits_t = detail::MethodTraits<M>;
+
+        return detail::AsFreeFunction<M, vMethodPtr>(std::make_index_sequence<Traits_t::arity>{});
+    }
+
+    ///
+    template <auto vMethodPtr>
+    constexpr auto AsFreeFunction()
+    {
+        return AsFreeFunction<decltype(vMethodPtr), vMethodPtr>();
     }
 
     /// Enumeration that specifies how code will be compiled
@@ -404,9 +436,7 @@ namespace tw
             }
             else
             {
-                using Traits_t = detail::MethodTraits<M>;
-
-                M_RegisterMethod<M, vMethodPtr>(name, std::make_index_sequence<Traits_t::arity>{});
+                RegisterFunction(name, AsFreeFunction<M, vMethodPtr>());
             }
         }
 
@@ -482,23 +512,6 @@ namespace tw
         }
 
     private:
-
-        /// Internal helper for RegisterMethod method
-        template <typename M, M vMethodPtr, size_t... Is>
-        void M_RegisterMethod(char const* name, std::index_sequence<Is...>) const
-        {
-            using Traits_t = detail::MethodTraits<M>;
-
-            using Class_t     = typename Traits_t::Class_t;
-            using PureClass_t = typename Traits_t::PureClass_t;
-            using Return_t    = typename Traits_t::Return_t;
-
-            auto function = +[](void* ptr, typename Traits_t::template NthArg_t<Is>... args) -> Return_t {
-                return (std::forward<Class_t>(*static_cast<PureClass_t*>(ptr)).*vMethodPtr)(std::forward<decltype(args)>(args)...);
-            };
-
-            RegisterFunction(name, function);
-        }
 
         TCCState* m_state = nullptr; ///< Internal state on which tcc operates
     };
