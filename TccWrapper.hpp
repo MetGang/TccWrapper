@@ -30,14 +30,15 @@ namespace tw
 {
     namespace detail
     {
-        template <typename Class, typename Ret, typename... Args>
+        template <typename PureClass, typename Class, typename Ret, typename... Args>
         struct MethodTraitsBase
         {
-            using Class_t  = Class;
-            using Return_t = Ret;
-            using Args_t   = std::tuple<Args...>;
+            using PureClass_t = PureClass;
+            using Class_t     = Class;
+            using Return_t    = Ret;
+            using Args_t      = std::tuple<Args...>;
             template <size_t N>
-            using NthArg_t = std::tuple_element_t<N, Args_t>;
+            using NthArg_t    = std::tuple_element_t<N, Args_t>;
 
             inline static constexpr auto arity = sizeof...(Args);
         };
@@ -46,22 +47,148 @@ namespace tw
         class MethodTraits;
 
         template <typename Class, typename Ret, typename... Args>
-        struct MethodTraits<Ret(Class::*)(Args...)> : MethodTraitsBase<Class, Ret, Args...> {};
+        struct MethodTraits<Ret(Class::*)(Args...)> : MethodTraitsBase<Class, Class, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args>
-        struct MethodTraits<Ret(Class::*)(Args...) const> : MethodTraitsBase<const Class, Ret, Args...> {};
+        struct MethodTraits<Ret(Class::*)(Args...) const> : MethodTraitsBase<Class, Class const, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args>
-        struct MethodTraits<Ret(Class::*)(Args...) &> : MethodTraitsBase<Class, Ret, Args...> {};
+        struct MethodTraits<Ret(Class::*)(Args...) volatile> : MethodTraitsBase<Class, Class volatile, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args>
-        struct MethodTraits<Ret(Class::*)(Args...) const&> : MethodTraitsBase<const Class, Ret, Args...> {};
+        struct MethodTraits<Ret(Class::*)(Args...) const volatile> : MethodTraitsBase<Class, Class const volatile, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args>
-        struct MethodTraits<Ret(Class::*)(Args...) &&> : MethodTraitsBase<Class, Ret, Args...> {};
+        struct MethodTraits<Ret(Class::*)(Args......)> : MethodTraitsBase<Class, Class, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args>
-        struct MethodTraits<Ret(Class::*)(Args...) const&&> : MethodTraitsBase<const Class, Ret, Args...> {};
+        struct MethodTraits<Ret(Class::*)(Args......) const> : MethodTraitsBase<Class, Class const, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) volatile> : MethodTraitsBase<Class, Class volatile, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const volatile> : MethodTraitsBase<Class, Class const volatile, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) &> : MethodTraitsBase<Class, Class&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const&> : MethodTraitsBase<Class, Class const&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) volatile&> : MethodTraitsBase<Class, Class volatile&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const volatile&> : MethodTraitsBase<Class, Class const volatile&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) &> : MethodTraitsBase<Class, Class&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const&> : MethodTraitsBase<Class, Class const&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) volatile&> : MethodTraitsBase<Class, Class volatile&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const volatile&> : MethodTraitsBase<Class, Class const volatile&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) &&> : MethodTraitsBase<Class, Class&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const&&> : MethodTraitsBase<Class, Class const&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) volatile&&> : MethodTraitsBase<Class, Class volatile&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const volatile&&> : MethodTraitsBase<Class, Class const volatile&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) &&> : MethodTraitsBase<Class, Class&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const&&> : MethodTraitsBase<Class, Class const&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) volatile&&> : MethodTraitsBase<Class, Class volatile&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const volatile&&> : MethodTraitsBase<Class, Class const volatile&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) noexcept> : MethodTraitsBase<Class, Class, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const noexcept> : MethodTraitsBase<Class, Class const, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) volatile noexcept> : MethodTraitsBase<Class, Class volatile, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const volatile noexcept> : MethodTraitsBase<Class, Class const volatile, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) noexcept> : MethodTraitsBase<Class, Class, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const noexcept> : MethodTraitsBase<Class, Class const, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) volatile noexcept> : MethodTraitsBase<Class, Class volatile, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const volatile noexcept> : MethodTraitsBase<Class, Class const volatile, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) & noexcept> : MethodTraitsBase<Class, Class&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const& noexcept> : MethodTraitsBase<Class, Class const&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) volatile& noexcept> : MethodTraitsBase<Class, Class volatile&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const volatile& noexcept> : MethodTraitsBase<Class, Class const volatile&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) & noexcept> : MethodTraitsBase<Class, Class&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const& noexcept> : MethodTraitsBase<Class, Class const&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) volatile& noexcept> : MethodTraitsBase<Class, Class volatile&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const volatile& noexcept> : MethodTraitsBase<Class, Class const volatile&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) && noexcept> : MethodTraitsBase<Class, Class&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const&& noexcept> : MethodTraitsBase<Class, Class const&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) volatile&& noexcept> : MethodTraitsBase<Class, Class volatile&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args...) const volatile&& noexcept> : MethodTraitsBase<Class, Class const volatile&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) && noexcept> : MethodTraitsBase<Class, Class&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const&& noexcept> : MethodTraitsBase<Class, Class const&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) volatile&& noexcept> : MethodTraitsBase<Class, Class volatile&&, Ret, Args...> {};
+
+        template <typename Class, typename Ret, typename... Args>
+        struct MethodTraits<Ret(Class::*)(Args......) const volatile&& noexcept> : MethodTraitsBase<Class, Class const volatile&&, Ret, Args...> {};
     }
 
     /// Enumeration that specifies how code will be compiled
@@ -362,11 +489,12 @@ namespace tw
         {
             using Traits_t = detail::MethodTraits<M>;
 
-            using Class_t  = typename Traits_t::Class_t;
-            using Return_t = typename Traits_t::Return_t;
+            using Class_t     = typename Traits_t::Class_t;
+            using PureClass_t = typename Traits_t::PureClass_t;
+            using Return_t    = typename Traits_t::Return_t;
 
-            auto function = +[](Class_t* ptr, typename Traits_t::template NthArg_t<Is>... args) -> Return_t {
-                return (ptr->*vMethodPtr)(std::forward<decltype(args)>(args)...);
+            auto function = +[](void* ptr, typename Traits_t::template NthArg_t<Is>... args) -> Return_t {
+                return (std::forward<Class_t>(*static_cast<PureClass_t*>(ptr)).*vMethodPtr)(std::forward<decltype(args)>(args)...);
             };
 
             RegisterFunction(name, function);
