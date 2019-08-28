@@ -20,8 +20,6 @@
 #include <stdexcept>
 #endif // TW_USE_EXCEPTIONS
 #include <tuple>
-#include <type_traits>
-#include <utility>
 
 // tcc
 #include "libtcc.h"
@@ -200,7 +198,7 @@ namespace tw
             using Return_t    = typename Traits_t::Return_t;
 
             auto function = +[](PureClass_t* ptr, typename Traits_t::template NthArg_t<Is>... args) -> Return_t {
-                return (std::forward<Class_t>(*ptr).*vMethodPtr)(std::forward<decltype(args)>(args)...);
+                return (static_cast<Class_t&&>(*ptr).*vMethodPtr)(std::forward<decltype(args)>(args)...);
             };
 
             return function;
@@ -495,11 +493,11 @@ namespace tw
 
             if (symbol)
             {
-                return std::make_optional<Ret>((*symbol)(std::forward<Args>(args)...));
+                return { (*symbol)(std::forward<Args>(args)...) };
             }
             else
             {
-                return std::nullopt;
+                return {};
             }
         }
 
