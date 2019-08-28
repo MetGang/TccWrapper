@@ -341,7 +341,7 @@ namespace tw
         }
 
         /// Compiles code to auto-managed memory, returns true on success
-        bool CompileToMemory() const
+        bool Compile() const
         {
             return tcc_relocate(m_state, TCC_RELOCATE_AUTO) != -1;
         }
