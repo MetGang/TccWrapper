@@ -75,7 +75,7 @@ int main()
 
     *tcc.GetSymbolAs<int>("scriptVar") = 23;
 
-    auto scriptFunc = tcc.GetSymbolAs<float(*)()>("ScriptFunc");
+    auto scriptFunc = tcc.GetFunction<float(*)()>("ScriptFunc");
     std::cout << "Value from ScriptFunc called in C++ -> " << scriptFunc() << '\n';
 
     return tcc.Call<int>("main");

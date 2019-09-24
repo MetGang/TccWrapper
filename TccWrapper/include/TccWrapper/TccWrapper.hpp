@@ -439,14 +439,7 @@ namespace tw
         {
             auto const symbol = GetSymbol(name);
 
-            if constexpr (std::is_function_v<std::remove_pointer_t<T>>)
-            {
-                return reinterpret_cast<T>(symbol);
-            }
-            else
-            {
-                return reinterpret_cast<T*>(symbol);
-            }
+            return reinterpret_cast<T*>(symbol);
         }
 
         /// Checks whether symbol with given name exists
@@ -455,11 +448,20 @@ namespace tw
             return GetSymbol(name) != nullptr;
         }
 
-        /// Registers symbol from parameter as free function with given name, won't override if called multiple times
-        template <typename Ret, typename... Args>
-        void RegisterFunction(char const* name, Ret (*function)(Args...)) const
+        /// Returns F pointer to function with given name or nullptr if no such symbol exists
+        template <typename F>
+        auto GetFunction(char const* name) const
         {
-            tcc_add_symbol(m_state, name, reinterpret_cast<void const*>(function));
+            auto const symbol = GetSymbol(name);
+
+            return reinterpret_cast<F>(symbol);
+        }
+
+        /// Registers symbol from parameter as free function with given name, won't override if called multiple times
+        template <typename F>
+        void RegisterFunction(char const* name, F functionPtr) const
+        {
+            tcc_add_symbol(m_state, name, reinterpret_cast<void const*>(functionPtr));
         }
 
         /// Registers symbol as free function with given name, won't override if called multiple times
@@ -510,7 +512,7 @@ namespace tw
         template <typename Ret, typename... Args>
         Ret Call(char const* name, Args&&... args) const
         {
-            auto const symbol = GetSymbolAs<Ret(*)(Args...)>(name);
+            auto const symbol = GetFunction<Ret(*)(Args...)>(name);
 
             if (symbol)
             {
@@ -528,7 +530,7 @@ namespace tw
         template <typename Ret, typename... Args>
         bool CallSafely(char const* name, Ret& output, Args&&... args) const
         {
-            auto const symbol = GetSymbolAs<Ret(*)(Args...)>(name);
+            auto const symbol = GetFunction<Ret(*)(Args...)>(name);
 
             if (symbol)
             {
@@ -548,7 +550,7 @@ namespace tw
         template <typename Ret, typename... Args>
         std::optional<Ret> CallSafelyOpt(char const* name, Args&&... args) const
         {
-            auto const symbol = GetSymbolAs<Ret(*)(Args...)>(name);
+            auto const symbol = GetFunction<Ret(*)(Args...)>(name);
 
             if (symbol)
             {
