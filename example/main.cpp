@@ -1,6 +1,6 @@
 #define TW_USE_OPTIONAL
 #define TW_USE_EXCEPTIONS
-#include <TccWrapper/TccWrapper.hpp>
+#include <TccWrapper.hpp>
 
 #include <iostream>
 
