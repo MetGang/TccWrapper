@@ -1,10 +1,19 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 typedef intptr_t Handle_t;
 
 float ScriptFunc()
 {
     return 1.5f;
+}
+
+void PrintNums(size_t n, ...)
+{
+    va_list vl;
+    va_start(vl, n);
+    for (size_t v = 0; v < n; ++v) printf("%i ", va_arg(vl, int));
+    va_end(vl);
 }
 
 export int scriptVar = 0;
