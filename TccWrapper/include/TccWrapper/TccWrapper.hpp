@@ -84,7 +84,7 @@ namespace tw
             static constexpr auto AsFreeFunction()
             {
                 return +[](std::remove_reference_t<Class>* ptr, Args... args) noexcept(vIsNoexcept) -> Ret {
-                    return (static_cast<Class&&>(*ptr).*vMethodPtr)(std::forward<Args>(args)...);
+                    return (std::forward<Class>(*ptr).*vMethodPtr)(std::forward<Args>(args)...);
                 };
             }
         };
