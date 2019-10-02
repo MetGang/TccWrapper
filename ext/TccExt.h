@@ -9,6 +9,8 @@
 #ifndef TWS_TccExt
 #define TWS_TccExt
 
+#include <stddef.h>
+
 #ifdef _WIN32
     #define export __declspec(dllexport)
     #define import extern __declspec(dllimport)
