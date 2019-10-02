@@ -1,2 +1,13 @@
+CXX = g++
+FLAGS = -std=c++17 -O2 -Wall -Wextra -Wpedantic
+
+IDIR = -I../include
+
+LDIR = -L.
+LIBS = -ltcc
+
+SRC = main.cpp
+OUT = a.exe
+
 all:
-	g++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -I../include main.cpp libtcc.a && ./a.exe
+	$(CXX) -o $(OUT) $(SRC) $(FLAGS) $(IDIR) $(LDIR) $(LIBS) && ./$(OUT)
