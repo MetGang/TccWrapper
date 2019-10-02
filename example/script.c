@@ -1,7 +1,7 @@
+#include <TccExt.h>
+
 #include <stdio.h>
 #include <stdarg.h>
-
-typedef intptr_t Handle_t;
 
 float ScriptFunc()
 {
@@ -21,10 +21,11 @@ export int scriptVar = 0;
 import int universeNumber;
 import float pi;
 
-// import void PrintHello(); // C allows implicit declarations
+import void PrintHello();
+// import void PrintFloat(Handle_t f);
 import int GetFour();
 
-import void Foo_Bar(Handle_t*, int);
+// import void Foo_Bar(Handle_t, int);
 
 int main()
 {
@@ -37,6 +38,9 @@ int main()
 
     import Handle_t foo;
     Foo_Bar(&foo, 20);
+
+    import Handle_t tau;
+    PrintFloat(&tau);
 
     printf("scriptVar which got changed in C++ -> %i", scriptVar);
 

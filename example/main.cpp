@@ -9,6 +9,11 @@ void PrintHello()
     std::cout << "Hello world!" << '\n';
 }
 
+void PrintFloat(float* f)
+{
+    std::cout << "Some float -> " << *f << '\n';
+}
+
 int GetFour()
 {
     return 4;
@@ -46,12 +51,10 @@ int main()
     });
 
     tcc.AddIncludePath("./win32/include");
+    tcc.AddIncludePath("../ext");
     tcc.AddLibraryPath(".");
     tcc.SetOutputType(tw::OutputType::Memory);
     tcc.SetOptions("-O2 -Wall -std=c99");
-
-    tcc.Define("export", "__declspec(dllexport)");
-    tcc.Define("import", "extern __declspec(dllimport)");
 
     tcc.Define("NAME", "\"TccWrapper\"");
     tcc.Define("VER", R"("1.0.2")");
@@ -62,7 +65,11 @@ int main()
     float pi = 3.14159f;
     tcc.AddSymbol("pi", &pi);
 
+    float tau = pi * 2.0f;
+    tcc.AddSymbol("tau", &tau);
+
     tcc.RegisterFunction<&PrintHello>("PrintHello");
+    tcc.RegisterFunction<&PrintFloat>("PrintFloat");
     tcc.RegisterFunction<&GetFour>("GetFour");
 
     Foo foo;
