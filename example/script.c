@@ -42,7 +42,7 @@ int main()
     import Handle_t tau;
     PrintFloat(&tau);
 
-    printf("scriptVar which got changed in C++ -> %i", scriptVar);
+    printf("scriptVar which got changed in C++ -> %i\n", scriptVar);
 
     return 0;
 }
