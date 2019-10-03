@@ -438,9 +438,9 @@ namespace tw
         template <typename F>
         auto GetFunction(char const* name) const
         {
-            if constexpr (std::is_function_v<std::remove_pointer_t<F>>)
+            if constexpr (std::is_function_v<F>)
             {
-                return reinterpret_cast<F>(GetSymbol(name));
+                return reinterpret_cast<F*>(GetSymbol(name));
             }
             else
             {
@@ -450,9 +450,9 @@ namespace tw
 
         /// Registers symbol from parameter as free function with given name, won't override if called multiple times
         template <typename F>
-        void RegisterFunction(char const* name, F functionPtr) const
+        void RegisterFunction(char const* name, F* functionPtr) const
         {
-            if constexpr (std::is_function_v<std::remove_pointer_t<F>>)
+            if constexpr (std::is_function_v<F>)
             {
                 tcc_add_symbol(m_state, name, reinterpret_cast<void const*>(functionPtr));
             }
@@ -503,7 +503,7 @@ namespace tw
         template <typename Ret, typename... Args>
         Ret Call(char const* name, Args&&... args) const
         {
-            auto const symbol = GetFunction<Ret(*)(Args...)>(name);
+            auto const symbol = GetFunction<Ret(Args...)>(name);
 
             if (symbol)
             {
@@ -521,7 +521,7 @@ namespace tw
         template <typename Ret, typename... Args>
         bool CallSafely(char const* name, Ret& output, Args&&... args) const
         {
-            auto const symbol = GetFunction<Ret(*)(Args...)>(name);
+            auto const symbol = GetFunction<Ret(Args...)>(name);
 
             if (symbol)
             {
@@ -541,7 +541,7 @@ namespace tw
         template <typename Ret, typename... Args>
         std::optional<Ret> CallSafelyOpt(char const* name, Args&&... args) const
         {
-            auto const symbol = GetFunction<Ret(*)(Args...)>(name);
+            auto const symbol = GetFunction<Ret(Args...)>(name);
 
             if (symbol)
             {
