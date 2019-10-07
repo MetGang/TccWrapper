@@ -84,7 +84,7 @@ namespace tw
         template <auto vMethodPtr, bool vIsNoexcept, bool vIsCVariadic, typename Class, typename Ret, typename... Args>
         struct MethodConverterBase
         {
-            static constexpr auto AsFreeFunction()
+            static constexpr auto AsFreeFunction() noexcept
             {
                 if constexpr (vIsCVariadic)
                 {
@@ -248,14 +248,14 @@ namespace tw
 
         ///
         template <typename M, M vMethodPtr>
-        constexpr auto AsFreeFunction()
+        constexpr auto AsFreeFunction() noexcept
         {
             return detail::MethodConverter<M, vMethodPtr>::AsFreeFunction();
         }
 
         ///
         template <auto vMethodPtr>
-        constexpr auto AsFreeFunction()
+        constexpr auto AsFreeFunction() noexcept
         {
             return AsFreeFunction<decltype(vMethodPtr), vMethodPtr>();
         }
@@ -280,7 +280,7 @@ namespace tw
         using State_t         = TCCState*;
 
         /// Initializes tcc state to nullptr
-        TccWrapper() = default;
+        TccWrapper() noexcept = default;
 
         /// Deleted copy-ctor
         TccWrapper(TccWrapper const&) = delete;
@@ -289,14 +289,14 @@ namespace tw
         TccWrapper& operator = (TccWrapper const&) = delete;
 
         /// Moves state from the rhs
-        TccWrapper(TccWrapper&& rhs)
+        TccWrapper(TccWrapper&& rhs) noexcept
             : m_state { rhs.m_state }
         {
             rhs.m_state = nullptr;
         }
 
         /// Moves state from the rhs and deletes current if possible
-        TccWrapper& operator = (TccWrapper&& rhs)
+        TccWrapper& operator = (TccWrapper&& rhs) noexcept
         {
             if (this != &rhs)
             {
@@ -314,7 +314,7 @@ namespace tw
         }
 
         /// Destroys tcc state if possible
-        ~TccWrapper()
+        ~TccWrapper() noexcept
         {
             if (m_state)
             {
@@ -323,20 +323,20 @@ namespace tw
         }
 
         /// Sets callback for printing error messages (void* for userData, char const* for message)
-        void SetErrorCallback(void* userData, ErrorCallback_t<> callback)
+        void SetErrorCallback(void* userData, ErrorCallback_t<> callback) noexcept
         {
             tcc_set_error_func(m_state, userData, callback);
         }
 
         /// Sets extended callback for printing error messages (T* for userData, char const* for message)
         template <typename T>
-        void SetExtErrorCallback(T* userData, ErrorCallback_t<T> callback)
+        void SetExtErrorCallback(T* userData, ErrorCallback_t<T> callback) noexcept
         {
             tcc_set_error_func(m_state, userData, reinterpret_cast<ErrorCallback_t<>>(callback));
         }
 
         /// Creates tcc compilation context, returns true on success
-        bool CreateContext()
+        bool CreateContext() noexcept
         {
             m_state = tcc_new();
 
@@ -344,99 +344,99 @@ namespace tw
         }
 
         /// Sets compilation output to the one of { Dll, Executable, Memory, Object }
-        void SetOutputType(OutputType outputType)
+        void SetOutputType(OutputType outputType) noexcept
         {
             tcc_set_output_type(m_state, static_cast<std::underlying_type_t<OutputType>>(outputType));
         }
 
         /// Sets options as from command line
-        void SetOptions(char const* options)
+        void SetOptions(char const* options) noexcept
         {
             tcc_set_options(m_state, options);
         }
 
         /// Adds include path (as with -Ipath)
-        void AddIncludePath(char const* path) const
+        void AddIncludePath(char const* path) const noexcept
         {
             tcc_add_include_path(m_state, path);
         }
 
         /// Adds system include path (as with -isystem path)
-        void AddSystemIncludePath(char const* path) const
+        void AddSystemIncludePath(char const* path) const noexcept
         {
             tcc_add_sysinclude_path(m_state, path);
         }
 
         /// Adds library path (as with -Lpath)
-        void AddLibraryPath(char const* path) const
+        void AddLibraryPath(char const* path) const noexcept
         {
             tcc_add_library_path(m_state, path);
         }
 
         /// Adds library (as with -lname)
-        void AddLibrary(char const* name) const
+        void AddLibrary(char const* name) const noexcept
         {
             tcc_add_library(m_state, name);
         }
 
         /// Adds file { C file, dll, object, library, ld script } for compilation, returns true on success
-        bool AddFile(char const* path) const
+        bool AddFile(char const* path) const noexcept
         {
             return tcc_add_file(m_state, path) != -1;
         }
 
         /// Adds string containing C source for compilation, returns true on success
-        bool AddSourceCode(char const* src)
+        bool AddSourceCode(char const* src) noexcept
         {
             return tcc_compile_string(m_state, src) != -1;
         }
 
         /// Compiles code to auto-managed memory, returns true on success
-        bool Compile() const
+        bool Compile() const noexcept
         {
             return tcc_relocate(m_state, TCC_RELOCATE_AUTO) != -1;
         }
 
         /// Defines symbol with given name and (optional) value (as with #define name value)
-        void Define(char const* name, char const* value = nullptr) const
+        void Define(char const* name, char const* value = nullptr) const noexcept
         {
             tcc_define_symbol(m_state, name, value);
         }
 
         /// Undefines symbol with given name (as with #undef name)
-        void Undefine(char const* name) const
+        void Undefine(char const* name) const noexcept
         {
             tcc_undefine_symbol(m_state, name);
         }
 
         /// Adds symbol with given name
-        void AddSymbol(char const* name, void const* symbol) const
+        void AddSymbol(char const* name, void const* symbol) const noexcept
         {
             tcc_add_symbol(m_state, name, symbol);
         }
 
         /// Returns void pointer to symbol with given name or nullptr if no such symbol exists
-        void* GetSymbol(char const* name) const
+        void* GetSymbol(char const* name) const noexcept
         {
             return tcc_get_symbol(m_state, name);
         }
 
         /// Returns T pointer to symbol with given name or nullptr if no such symbol exists
         template <typename T>
-        auto GetSymbolAs(char const* name) const
+        auto GetSymbolAs(char const* name) const noexcept
         {
             return reinterpret_cast<T*>(GetSymbol(name));
         }
 
         /// Checks whether symbol with given name exists
-        bool HasSymbol(char const* name) const
+        bool HasSymbol(char const* name) const noexcept
         {
             return GetSymbol(name) != nullptr;
         }
 
         /// Returns F pointer to function with given name or nullptr if no such symbol exists
         template <typename F>
-        auto GetFunction(char const* name) const
+        auto GetFunction(char const* name) const noexcept
         {
             if constexpr (std::is_function_v<F>)
             {
@@ -450,7 +450,7 @@ namespace tw
 
         /// Registers symbol from parameter as free function with given name, won't override if called multiple times
         template <typename F>
-        void RegisterFunction(char const* name, F* functionPtr) const
+        void RegisterFunction(char const* name, F* functionPtr) const noexcept
         {
             if constexpr (std::is_function_v<F>)
             {
@@ -464,21 +464,21 @@ namespace tw
 
         /// Registers symbol as free function with given name, won't override if called multiple times
         template <typename F, F vFunctionPtr>
-        void RegisterFunction(char const* name) const
+        void RegisterFunction(char const* name) const noexcept
         {
             RegisterFunction(name, vFunctionPtr);
         }
 
         /// Registers symbol as free function with given name, won't override if called multiple times
         template <auto vFunctionPtr>
-        void RegisterFunction(char const* name) const
+        void RegisterFunction(char const* name) const noexcept
         {
             RegisterFunction<decltype(vFunctionPtr), vFunctionPtr>(name);
         }
 
         /// Registers symbol as class method with given name, won't override if called multiple times
         template <typename M, M vMethodPtr>
-        void RegisterMethod(char const* name) const
+        void RegisterMethod(char const* name) const noexcept
         {
             if constexpr (std::is_member_function_pointer_v<M>)
             {
@@ -492,7 +492,7 @@ namespace tw
 
         /// Registers symbol as class method with given name, won't override if called multiple times
         template <auto vMethodPtr>
-        void RegisterMethod(char const* name) const
+        void RegisterMethod(char const* name) const noexcept
         {
             RegisterMethod<decltype(vMethodPtr), vMethodPtr>(name);
         }
@@ -519,7 +519,7 @@ namespace tw
 
         /// Tries to call function with given args, returns true on success
         template <typename Ret, typename... Args>
-        bool CallSafely(char const* name, Ret& output, Args&&... args) const
+        bool CallSafely(char const* name, Ret& output, Args&&... args) const noexcept
         {
             auto const symbol = GetFunction<Ret(Args...)>(name);
 
@@ -539,7 +539,7 @@ namespace tw
 
         /// Tries to call function with given args, returns optional with call result
         template <typename Ret, typename... Args>
-        std::optional<Ret> CallSafelyOpt(char const* name, Args&&... args) const
+        std::optional<Ret> CallSafelyOpt(char const* name, Args&&... args) const noexcept
         {
             auto const symbol = GetFunction<Ret(Args...)>(name);
 
@@ -556,7 +556,7 @@ namespace tw
         #endif // TW_USE_OPTIONAL
 
         /// Returns internal state on which tcc operates
-        State_t GetState() const
+        State_t GetState() const noexcept
         {
             return m_state;
         }
