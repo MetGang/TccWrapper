@@ -503,7 +503,7 @@ namespace tw
         template <typename Ret, typename... Args>
         Ret Call(char const* name, Args&&... args) const
         {
-            auto const symbol = GetFunction<Ret(Args...)>(name);
+            auto const symbol = GetFunction<Ret(Args...) noexcept>(name);
 
             if (symbol)
             {
@@ -521,7 +521,7 @@ namespace tw
         template <typename Ret, typename... Args>
         bool CallSafely(char const* name, Ret& output, Args&&... args) const noexcept
         {
-            auto const symbol = GetFunction<Ret(Args...)>(name);
+            auto const symbol = GetFunction<Ret(Args...) noexcept>(name);
 
             if (symbol)
             {
@@ -541,7 +541,7 @@ namespace tw
         template <typename Ret, typename... Args>
         std::optional<Ret> CallSafelyOpt(char const* name, Args&&... args) const noexcept
         {
-            auto const symbol = GetFunction<Ret(Args...)>(name);
+            auto const symbol = GetFunction<Ret(Args...) noexcept>(name);
 
             if (symbol)
             {
