@@ -97,6 +97,12 @@ namespace tw
             }
         }
 
+        template <typename Arg>
+        constexpr auto ToUnderlying(Arg arg)
+        {
+            return static_cast<std::underlying_type_t<Arg>>(arg);
+        }
+
         template <auto vMethodPtr, bool vIsNoexcept, bool vIsCVariadic, typename Class, typename Ret, typename... Args>
         struct MethodConverterBase
         {
@@ -362,7 +368,7 @@ namespace tw
         /// Sets compilation output to the one of { Dll, Executable, Memory, Object }
         void SetOutputType(OutputType outputType) noexcept
         {
-            tcc_set_output_type(m_state, static_cast<std::underlying_type_t<OutputType>>(outputType));
+            tcc_set_output_type(m_state, detail::ToUnderlying(outputType));
         }
 
         /// Sets options as from command line
