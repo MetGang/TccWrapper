@@ -82,7 +82,7 @@ namespace tw
         template <typename...>
         inline constexpr bool alwaysFalse = false;
 
-        template <class To, class From>
+        template <typename To, typename From>
         constexpr To BitCast(From const& src) noexcept
         {
             if constexpr ((sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<From> && std::is_trivial_v<To>)
