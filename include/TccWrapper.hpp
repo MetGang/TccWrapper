@@ -13,6 +13,7 @@
 #pragma once
 
 // C++
+#include <cstring>
 #ifdef TW_USE_OPTIONAL
 #include <optional>
 #endif // TW_USE_OPTIONAL
@@ -80,6 +81,21 @@ namespace tw
     {
         template <typename...>
         inline constexpr bool alwaysFalse = false;
+
+        template <class To, class From>
+        constexpr To BitCast(From const& src) noexcept
+        {
+            if constexpr ((sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<From> && std::is_trivial_v<To>)
+            {
+                To dst;
+                std::memcpy(&dst, &src, sizeof(To));
+                return dst;
+            }
+            else
+            {
+                static_assert(detail::alwaysFalse<To, From>, "Types requirements not met!");
+            }
+        }
 
         template <auto vMethodPtr, bool vIsNoexcept, bool vIsCVariadic, typename Class, typename Ret, typename... Args>
         struct MethodConverterBase
@@ -332,7 +348,7 @@ namespace tw
         template <typename T>
         void SetExtErrorCallback(T* userData, ErrorCallback_t<T> callback) noexcept
         {
-            tcc_set_error_func(m_state, userData, reinterpret_cast<ErrorCallback_t<>>(callback));
+            tcc_set_error_func(m_state, userData, detail::BitCast<ErrorCallback_t<>>(callback));
         }
 
         /// Creates tcc compilation context, returns true on success
@@ -425,7 +441,7 @@ namespace tw
         template <typename T>
         auto GetSymbolAs(char const* name) const noexcept
         {
-            return reinterpret_cast<T*>(GetSymbol(name));
+            return detail::BitCast<T*>(GetSymbol(name));
         }
 
         /// Checks whether symbol with given name exists
@@ -440,7 +456,7 @@ namespace tw
         {
             if constexpr (std::is_function_v<F>)
             {
-                return reinterpret_cast<F*>(GetSymbol(name));
+                return detail::BitCast<F*>(GetSymbol(name));
             }
             else
             {
@@ -454,7 +470,7 @@ namespace tw
         {
             if constexpr (std::is_function_v<F>)
             {
-                tcc_add_symbol(m_state, name, reinterpret_cast<void const*>(functionPtr));
+                tcc_add_symbol(m_state, name, detail::BitCast<void const*>(functionPtr));
             }
             else
             {
