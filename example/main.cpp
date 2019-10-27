@@ -35,14 +35,15 @@ private:
 
 int main()
 {
-    tw::TccWrapper tcc;
+    tw::TccWrapper tcc{ tw::AutoInit{} };
+    // tw::TccWrapper tcc;
 
-    if (!tcc.CreateContext())
-    {
-        std::cerr << "Unable to create tcc context" << '\n';
-
-        return -1;
-    }
+    // if (!tcc.CreateContext())
+    // {
+    //     std::cerr << "Unable to create tcc context" << '\n';
+    //
+    //     return -1;
+    // }
 
     int errorCode = 123;
 

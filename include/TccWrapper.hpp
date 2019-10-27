@@ -292,6 +292,9 @@ namespace tw
         Object = TCC_OUTPUT_OBJ
     };
 
+    ///
+    struct AutoInit {};
+
     /// Wrapper around TCCState* with set of useful methods
     class TccWrapper
     {
@@ -303,6 +306,20 @@ namespace tw
 
         /// Initializes tcc state to nullptr
         TccWrapper() noexcept = default;
+
+        #ifdef TW_USE_EXCEPTIONS
+
+        /// Creates tcc compilation context, throws on failure
+        TccWrapper(AutoInit&&)
+            : m_state{ tcc_new() }
+        {
+            if (!m_state)
+            {
+                throw std::runtime_error("TccWrapper::TccWrapper() - unable to create tcc compilation context");
+            }
+        }
+
+        #endif
 
         /// Deleted copy-ctor
         TccWrapper(TccWrapper const&) = delete;
