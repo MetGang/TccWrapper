@@ -350,6 +350,12 @@ namespace tw
             return *this;
         }
 
+        /// Deleted const move-ctor
+        TccWrapper(TccWrapper const&&) = delete;
+
+        /// Deleted const move-assign-op
+        TccWrapper& operator = (TccWrapper const&&) = delete;
+
         /// Destroys tcc state if possible
         ~TccWrapper() noexcept
         {
