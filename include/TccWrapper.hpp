@@ -345,14 +345,14 @@ namespace tw
         }
 
         /// Sets callback for printing error messages (void* for userData, char const* for message)
-        void SetErrorCallback(void* userData, ErrorCallback_t<> callback) noexcept
+        void SetErrorCallback(void* userData, ErrorCallback_t<> callback) const noexcept
         {
             tcc_set_error_func(m_state, userData, callback);
         }
 
         /// Sets extended callback for printing error messages (T* for userData, char const* for message)
         template <typename T>
-        void SetExtErrorCallback(T* userData, ErrorCallback_t<T> callback) noexcept
+        void SetExtErrorCallback(T* userData, ErrorCallback_t<T> callback) const noexcept
         {
             tcc_set_error_func(m_state, userData, detail::BitCast<ErrorCallback_t<>>(callback));
         }
@@ -366,13 +366,13 @@ namespace tw
         }
 
         /// Sets compilation output to the one of { Dll, Executable, Memory, Object }
-        void SetOutputType(OutputType outputType) noexcept
+        void SetOutputType(OutputType outputType) const noexcept
         {
             tcc_set_output_type(m_state, detail::ToUnderlying(outputType));
         }
 
         /// Sets options as from command line
-        void SetOptions(char const* options) noexcept
+        void SetOptions(char const* options) const noexcept
         {
             tcc_set_options(m_state, options);
         }
@@ -408,7 +408,7 @@ namespace tw
         }
 
         /// Adds string containing C source for compilation, returns true on success
-        bool AddSourceCode(char const* src) noexcept
+        bool AddSourceCode(char const* src) const noexcept
         {
             return tcc_compile_string(m_state, src) != -1;
         }
