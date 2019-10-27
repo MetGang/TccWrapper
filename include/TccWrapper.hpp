@@ -42,7 +42,7 @@ extern "C"
 
     void tcc_set_lib_path(TCCState* state, char const* path);
 
-    void tcc_set_error_func(TCCState* state, void* userData, void (*function)(void* userData, char const* msg));
+    void tcc_set_error_func(TCCState* state, void* userData, void (*callback)(void* userData, char const* msg));
 
     void tcc_set_options(TCCState* state, char const* str);
 
@@ -300,9 +300,7 @@ namespace tw
     {
     public:
 
-        template <typename T = void>
-        using ErrorCallback_t = void (*)(T*, char const*);
-        using State_t         = TCCState*;
+        using State_t = TCCState*;
 
         /// Initializes tcc state to nullptr
         TccWrapper() noexcept = default;
@@ -361,17 +359,10 @@ namespace tw
             }
         }
 
-        /// Sets callback for printing error messages (void* for userData, char const* for message)
-        void SetErrorCallback(void* userData, ErrorCallback_t<> callback) const noexcept
+        /// Sets callback for printing error messages
+        void SetErrorCallback(void* userData, void (*callback)(void* userData, char const* msg)) const noexcept
         {
             tcc_set_error_func(m_state, userData, callback);
-        }
-
-        /// Sets extended callback for printing error messages (T* for userData, char const* for message)
-        template <typename T>
-        void SetExtErrorCallback(T* userData, ErrorCallback_t<T> callback) const noexcept
-        {
-            tcc_set_error_func(m_state, userData, detail::BitCast<ErrorCallback_t<>>(callback));
         }
 
         /// Creates tcc compilation context, returns true on success

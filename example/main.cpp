@@ -47,8 +47,8 @@ int main()
 
     int errorCode = 123;
 
-    tcc.SetExtErrorCallback(&errorCode, +[](int* errorCode, const char* message) {
-        std::cerr << *errorCode << " | " << message << '\n';
+    tcc.SetErrorCallback(&errorCode, +[](void* errorCode, const char* message) {
+        std::cerr << *static_cast<int*>(errorCode) << " | " << message << '\n';
     });
 
     tcc.AddIncludePath("./win32/include");
