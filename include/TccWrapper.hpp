@@ -591,6 +591,20 @@ namespace tw
 
         #endif // TW_USE_OPTIONAL
 
+        /// Outputs dll, exe or obj file depending on current outputType, returns true on success
+        bool OutputFile(char const* filename) const noexcept
+        {
+            return tcc_output_file(m_state, filename) != -1;
+        }
+
+        /// Outputs dll, exe or obj file depending on sent outputType, returns true on success
+        bool OutputFile(char const* filename, OutputType outputType) const noexcept
+        {
+            SetOutputType(outputType);
+
+            return OutputFile(filename);
+        }
+
         /// Returns internal state on which tcc operates
         State_t GetState() const noexcept
         {
