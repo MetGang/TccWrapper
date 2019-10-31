@@ -54,7 +54,6 @@ int main()
     tcc.AddIncludePath("./win32/include");
     tcc.AddIncludePath("../ext");
     tcc.AddLibraryPath("./win32"); // just for Windows, Linux should search for libtcc1.a in "/usr/local/lib/tcc"
-    tcc.SetOutputType(tw::OutputType::Memory);
     tcc.SetOptions("-O2 -Wall -std=c99");
 
     tcc.Define("NAME", "\"TccWrapper\"");

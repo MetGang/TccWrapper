@@ -288,7 +288,6 @@ namespace tw
     {
         Dll = TCC_OUTPUT_DLL,
         Executable = TCC_OUTPUT_EXE,
-        Memory = TCC_OUTPUT_MEMORY,
         Object = TCC_OUTPUT_OBJ
     };
 
@@ -379,12 +378,6 @@ namespace tw
             return m_state;
         }
 
-        /// Sets compilation output to the one of { Dll, Executable, Memory, Object }
-        void SetOutputType(OutputType outputType) const noexcept
-        {
-            tcc_set_output_type(m_state, detail::ToUnderlying(outputType));
-        }
-
         /// Sets options as from command line
         void SetOptions(char const* options) const noexcept
         {
@@ -430,6 +423,8 @@ namespace tw
         /// Compiles code to auto-managed memory, returns true on success
         bool Compile() const noexcept
         {
+            tcc_set_output_type(m_state, TCC_OUTPUT_MEMORY);
+
             return tcc_relocate(m_state, TCC_RELOCATE_AUTO) != -1;
         }
 
@@ -591,18 +586,12 @@ namespace tw
 
         #endif // TW_USE_OPTIONAL
 
-        /// Outputs dll, exe or obj file depending on current outputType, returns true on success
-        bool OutputFile(char const* filename) const noexcept
-        {
-            return tcc_output_file(m_state, filename) != -1;
-        }
-
-        /// Outputs dll, exe or obj file depending on sent outputType, returns true on success
+        /// Outputs dll, exe or obj file depending on outputType, returns true on success
         bool OutputFile(char const* filename, OutputType outputType) const noexcept
         {
-            SetOutputType(outputType);
+            tcc_set_output_type(m_state, detail::ToUnderlying(outputType));
 
-            return OutputFile(filename);
+            return tcc_output_file(m_state, filename) != -1;
         }
 
         /// Returns internal state on which tcc operates
