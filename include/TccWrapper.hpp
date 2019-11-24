@@ -152,49 +152,49 @@ namespace tw
         struct MethodConverter<Ret(Class::*)(Args...) &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) const&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) const &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) volatile&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class volatile&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) volatile &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class volatile&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) const volatile&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const volatile&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) const volatile &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const volatile&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) const&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) const &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) volatile&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class volatile&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) volatile &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class volatile&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const volatile&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const volatile&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) const&&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) const &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) volatile&&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class volatile&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) volatile &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class volatile&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) const volatile&&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const volatile&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) const volatile &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const volatile&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) const&&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) const &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) volatile&&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class volatile&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) volatile &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class volatile&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile&&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const volatile&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const volatile&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class, Ret, Args...> {};
@@ -224,49 +224,49 @@ namespace tw
         struct MethodConverter<Ret(Class::*)(Args...) & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) const& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) const & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) volatile& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class volatile&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) volatile & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class volatile&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) const volatile& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const volatile&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) const volatile & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const volatile&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) const& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) const & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) volatile& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class volatile&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) volatile & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class volatile&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) const&& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) const && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) volatile&& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class volatile&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class volatile&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args...) const volatile&& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const volatile&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args...) const volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const volatile&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) const&& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) const && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) volatile&& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class volatile&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class volatile&&, Ret, Args...> {};
 
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
-        struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile&& noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile&&, Ret, Args...> {};
+        struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile&&, Ret, Args...> {};
 
         ///
         template <typename M, M vMethodPtr>
