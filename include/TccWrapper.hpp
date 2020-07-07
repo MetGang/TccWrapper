@@ -424,6 +424,13 @@ namespace tw
             return m_state;
         }
 
+        /// Destroys tcc compilation context
+        void DestroyContext() noexcept
+        {
+            M_Destroy();
+            M_Reset();
+        }
+
         /// Sets options as from command line
         void SetOptions(char const* options) const noexcept
         {
