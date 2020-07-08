@@ -659,6 +659,12 @@ namespace tw
             return m_state;
         }
 
+        /// Returns implicitly internal state on which tcc operates
+        operator State_t() const noexcept
+        {
+            return m_state;
+        }
+
     private:
 
         /// PRIVATE: Destroys internal state of the wrapper
