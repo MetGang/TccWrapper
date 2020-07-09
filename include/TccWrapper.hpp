@@ -481,6 +481,20 @@ namespace tw
             return tcc_relocate(m_state, TCC_RELOCATE_AUTO) != -1;
         }
 
+        /// Returns required size for the buffer to which code will be compiled or -1 on failure, call only once
+        int32_t GetRequiredBufferSize() const noexcept
+        {
+            tcc_set_output_type(m_state, TCC_OUTPUT_MEMORY);
+
+            return tcc_relocate(m_state, nullptr);
+        }
+
+        /// Compiles code to user defined buffer, returns true on success, call GetRequiredBufferSize() before this
+        bool CompileToBuffer(void* buffer) const noexcept
+        {
+            return tcc_relocate(m_state, buffer) != -1;
+        }
+
         /// Defines symbol with given name and (optional) value (as with #define name value)
         void Define(char const* name, char const* value = nullptr) const noexcept
         {
