@@ -380,7 +380,7 @@ namespace tw
         TccWrapper(TccWrapper&& rhs) noexcept
             : m_state { rhs.m_state }
         {
-            rhs.M_Reset();
+            rhs.m_state = nullptr;
         }
 
         /// Moves state from the rhs and deletes current one
@@ -388,11 +388,14 @@ namespace tw
         {
             if (this != &rhs)
             {
-                M_Destroy();
+                if (m_state)
+                {
+                    tcc_delete(m_state);
+                }
 
                 m_state = rhs.m_state;
 
-                rhs.M_Reset();
+                rhs.m_state = nullptr;
             }
 
             return *this;
@@ -407,7 +410,10 @@ namespace tw
         /// Destroys tcc state
         ~TccWrapper() noexcept
         {
-            M_Destroy();
+            if (m_state)
+            {
+                tcc_delete(m_state);
+            }
         }
 
         /// Sets function for printing error messages
@@ -427,8 +433,12 @@ namespace tw
         /// Destroys tcc compilation context
         void DestroyContext() noexcept
         {
-            M_Destroy();
-            M_Reset();
+            if (m_state)
+            {
+                tcc_delete(m_state);
+
+                m_state = nullptr;
+            }
         }
 
         /// Sets options as from command line
@@ -680,21 +690,6 @@ namespace tw
         }
 
     private:
-
-        /// PRIVATE: Destroys internal state of the wrapper
-        void M_Destroy() noexcept
-        {
-            if (m_state)
-            {
-                tcc_delete(m_state);
-            }
-        }
-
-        /// PRIVATE: Resets internal state of the wrapper
-        void M_Reset() noexcept
-        {
-            m_state = nullptr;
-        }
 
         State_t m_state;
     };
