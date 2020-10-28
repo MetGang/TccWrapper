@@ -106,7 +106,7 @@ namespace tw
             }
             else
             {
-                static_assert(detail::alwaysFalse<To, From>, "Type requirements not met!");
+                static_assert(alwaysFalse<To, From>, "Type requirements not met!");
             }
         }
 
@@ -118,7 +118,7 @@ namespace tw
             {
                 if constexpr (vIsCVariadic)
                 {
-                    static_assert(detail::alwaysFalse<Class>, "C-like variadic arguments in method are not supported!");
+                    static_assert(alwaysFalse<Class>, "C-like variadic arguments in method are not supported!");
                 }
                 else
                 {
