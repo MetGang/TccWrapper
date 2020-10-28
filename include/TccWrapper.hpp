@@ -348,7 +348,7 @@ namespace tw
         Object = TCC_OUTPUT_OBJ
     };
 
-    /// Returns value as underlying type of OutputType enum
+    /// Return value as underlying type of OutputType enum
     constexpr auto operator+(OutputType value) noexcept
     {
         return static_cast<std::underlying_type_t<OutputType>>(value);
@@ -363,7 +363,7 @@ namespace tw
         using ErrorFunc_t       = TCCErrorFunc;
         using ListSymbolsFunc_t = TCCListSymbolsFunc;
 
-        /// Initializes tcc state to nullptr
+        /// Initialize tcc state to nullptr
         TccWrapper() noexcept
             : m_state { nullptr }
         {
@@ -376,14 +376,14 @@ namespace tw
         /// Deleted copy-assign-op
         TccWrapper& operator = (TccWrapper const&) = delete;
 
-        /// Moves state from the rhs
+        /// Move state from the rhs
         TccWrapper(TccWrapper&& rhs) noexcept
             : m_state { rhs.m_state }
         {
             rhs.m_state = nullptr;
         }
 
-        /// Moves state from the rhs and deletes current one
+        /// Move state from the rhs and delete current one
         TccWrapper& operator = (TccWrapper&& rhs) noexcept
         {
             if (this != &rhs)
@@ -407,7 +407,7 @@ namespace tw
         /// Deleted const move-assign-op to prevent move from const
         TccWrapper& operator = (TccWrapper const&&) = delete;
 
-        /// Destroys tcc state
+        /// Destroy tcc state
         ~TccWrapper() noexcept
         {
             if (m_state)
@@ -416,13 +416,13 @@ namespace tw
             }
         }
 
-        /// Sets function for printing error messages
+        /// Set function for printing error messages
         void SetErrorCallback(void* userData, ErrorFunc_t function) const noexcept
         {
             tcc_set_error_func(m_state, userData, function);
         }
 
-        /// Creates tcc compilation context, returns true on success
+        /// Create tcc compilation context, return true on success
         bool CreateContext() noexcept
         {
             m_state = tcc_new();
@@ -430,7 +430,7 @@ namespace tw
             return m_state;
         }
 
-        /// Destroys tcc compilation context
+        /// Destroy tcc compilation context
         void DestroyContext() noexcept
         {
             if (m_state)
@@ -441,49 +441,49 @@ namespace tw
             }
         }
 
-        /// Sets options as from command line
+        /// Set options as from command line
         void SetOptions(char const* options) const noexcept
         {
             tcc_set_options(m_state, options);
         }
 
-        /// Adds include path (as with -Ipath)
+        /// Add include path (as with -Ipath)
         void AddIncludePath(char const* path) const noexcept
         {
             tcc_add_include_path(m_state, path);
         }
 
-        /// Adds system include path (as with -isystem path)
+        /// Add system include path (as with -isystem path)
         void AddSystemIncludePath(char const* path) const noexcept
         {
             tcc_add_sysinclude_path(m_state, path);
         }
 
-        /// Adds library path (as with -Lpath)
+        /// Add library path (as with -Lpath)
         void AddLibraryPath(char const* path) const noexcept
         {
             tcc_add_library_path(m_state, path);
         }
 
-        /// Adds library (as with -lname)
+        /// Add library (as with -lname)
         void AddLibrary(char const* name) const noexcept
         {
             tcc_add_library(m_state, name);
         }
 
-        /// Adds file { C file, dll, object, library, ld script } for compilation, returns true on success
+        /// Add file { C file, dll, object, library, ld script } for compilation, return true on success
         bool AddFile(char const* path) const noexcept
         {
             return tcc_add_file(m_state, path) != -1;
         }
 
-        /// Adds string containing C source for compilation, returns true on success
+        /// Add null-terminated string containing C source for compilation, return true on success
         bool AddSourceCode(char const* src) const noexcept
         {
             return tcc_compile_string(m_state, src) != -1;
         }
 
-        /// Compiles code to auto-managed memory, returns true on success
+        /// Compile code to auto-managed memory, return true on success
         bool Compile() const noexcept
         {
             tcc_set_output_type(m_state, TCC_OUTPUT_MEMORY);
@@ -491,7 +491,7 @@ namespace tw
             return tcc_relocate(m_state, TCC_RELOCATE_AUTO) != -1;
         }
 
-        /// Returns required size for the buffer to which code will be compiled or -1 on failure, call only once
+        /// Return required size for the buffer to which code will be compiled or -1 on failure, call only once
         int32_t GetRequiredBufferSize() const noexcept
         {
             tcc_set_output_type(m_state, TCC_OUTPUT_MEMORY);
@@ -499,56 +499,56 @@ namespace tw
             return tcc_relocate(m_state, nullptr);
         }
 
-        /// Compiles code to user defined buffer, returns true on success, call GetRequiredBufferSize() before this
+        /// Compile code to user defined buffer, return true on success, call GetRequiredBufferSize() before this
         bool CompileToBuffer(void* buffer) const noexcept
         {
             return tcc_relocate(m_state, buffer) != -1;
         }
 
-        /// Defines symbol with given name and (optional) value (as with #define name value)
+        /// Define symbol with given name and (optional) value (as with #define name value)
         void Define(char const* name, char const* value = nullptr) const noexcept
         {
             tcc_define_symbol(m_state, name, value);
         }
 
-        /// Undefines symbol with given name (as with #undef name)
+        /// Undefine symbol with given name (as with #undef name)
         void Undefine(char const* name) const noexcept
         {
             tcc_undefine_symbol(m_state, name);
         }
 
-        /// Adds symbol with given name
+        /// Add symbol with given name
         void AddSymbol(char const* name, void const* symbol) const noexcept
         {
             tcc_add_symbol(m_state, name, symbol);
         }
 
-        /// Returns void pointer to symbol with given name or nullptr if no such symbol exists
+        /// Return void pointer to symbol with given name or nullptr if no such symbol exists
         void* GetSymbol(char const* name) const noexcept
         {
             return tcc_get_symbol(m_state, name);
         }
 
-        /// Returns T pointer to symbol with given name or nullptr if no such symbol exists
+        /// Return T pointer to symbol with given name or nullptr if no such symbol exists
         template <typename T>
         auto GetSymbolAs(char const* name) const noexcept
         {
             return detail::BitCast<T*>(GetSymbol(name));
         }
 
-        /// Checks whether symbol with given name exists
+        /// Check whether symbol with given name exists
         bool HasSymbol(char const* name) const noexcept
         {
             return GetSymbol(name) != nullptr;
         }
 
-        /// Invokes function for each symbol registered in the context
+        /// Invoke function for each symbol registered in the context
         void ForEachSymbol(void* userData, ListSymbolsFunc_t function) const noexcept
         {
             tcc_list_symbols(m_state, userData, function);
         }
 
-        /// Returns F pointer to function with given name or nullptr if no such symbol exists
+        /// Return F pointer to function with given name or nullptr if no such symbol exists
         template <typename F>
         auto GetFunction(char const* name) const noexcept
         {
@@ -562,7 +562,7 @@ namespace tw
             }
         }
 
-        /// Registers symbol from parameter as free function with given name, won't override if called multiple times
+        /// Register symbol from parameter as free function with given name, won't override if called multiple times
         template <typename F>
         void RegisterFunction(char const* name, F* functionPtr) const noexcept
         {
@@ -576,21 +576,21 @@ namespace tw
             }
         }
 
-        /// Registers symbol as free function with given name, won't override if called multiple times
+        /// Register symbol as free function with given name, won't override if called multiple times
         template <typename F, F vFunctionPtr>
         void RegisterFunction(char const* name) const noexcept
         {
             RegisterFunction(name, vFunctionPtr);
         }
 
-        /// Registers symbol as free function with given name, won't override if called multiple times
+        /// Register symbol as free function with given name, won't override if called multiple times
         template <auto vFunctionPtr>
         void RegisterFunction(char const* name) const noexcept
         {
             RegisterFunction(name, vFunctionPtr);
         }
 
-        /// Registers symbol as class method with given name, won't override if called multiple times
+        /// Register symbol as class method with given name, won't override if called multiple times
         template <typename M, M vMethodPtr>
         void RegisterMethod(char const* name) const noexcept
         {
@@ -604,7 +604,7 @@ namespace tw
             }
         }
 
-        /// Registers symbol as class method with given name, won't override if called multiple times
+        /// Register symbol as class method with given name, won't override if called multiple times
         template <auto vMethodPtr>
         void RegisterMethod(char const* name) const noexcept
         {
@@ -613,7 +613,7 @@ namespace tw
 
         #ifdef TW_USE_EXCEPTIONS
 
-        /// Tries to call function with given args, throws if no such function symbol exists
+        /// Try to call function with given args, throw if no such function symbol exists
         template <typename Ret, typename... Args>
         Ret Call(char const* name, Args&&... args) const
         {
@@ -631,7 +631,7 @@ namespace tw
 
         #endif // TW_USE_EXCEPTIONS
 
-        /// Tries to call function with given args, returns true on success
+        /// Try to call function with given args, return true on success
         template <typename Ret, typename... Args>
         bool CallSafely(char const* name, Ret& output, Args&&... args) const noexcept
         {
@@ -651,7 +651,7 @@ namespace tw
 
         #ifdef TW_USE_OPTIONAL
 
-        /// Tries to call function with given args, returns optional with call result
+        /// Try to call function with given args, return optional with call result
         template <typename Ret, typename... Args>
         std::optional<Ret> CallSafelyOpt(char const* name, Args&&... args) const noexcept
         {
@@ -669,7 +669,7 @@ namespace tw
 
         #endif // TW_USE_OPTIONAL
 
-        /// Outputs file depending on outputType, returns true on success
+        /// Output file depending on outputType, return true on success
         bool OutputFile(char const* filename, OutputType outputType) const noexcept
         {
             tcc_set_output_type(m_state, +outputType);
@@ -677,7 +677,7 @@ namespace tw
             return tcc_output_file(m_state, filename) != -1;
         }
 
-        /// Returns internal state on which tcc operates
+        /// Return internal state on which tcc operates
         State_t GetState() const noexcept
         {
             return m_state;
