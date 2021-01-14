@@ -401,10 +401,10 @@ namespace tw
             return *this;
         }
 
-        /// Deleted const move-ctor to prevent move from const
+        /// Deleted const move-ctor to prevent moving from const
         TccWrapper(TccWrapper const&&) = delete;
 
-        /// Deleted const move-assign-op to prevent move from const
+        /// Deleted const move-assign-op to prevent moving from const
         TccWrapper& operator = (TccWrapper const&&) = delete;
 
         /// Destroy tcc state
