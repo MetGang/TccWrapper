@@ -531,11 +531,11 @@ namespace tw
         }
 
         /// Return required size for the buffer to which code will be compiled or -1 on failure, call only once
-        ssize_t GetRequiredBufferSize() const noexcept
+        int GetRequiredBufferSize() const noexcept
         {
             tcc_set_output_type(m_state, TCC_OUTPUT_MEMORY);
 
-            return static_cast<ssize_t>(tcc_relocate(m_state, nullptr));
+            return tcc_relocate(m_state, nullptr);
         }
 
         /// Compile code to user defined buffer, return true on success, call GetRequiredBufferSize() before this
@@ -654,7 +654,7 @@ namespace tw
         template <typename Ret, typename... Args>
         Ret Call(char const* name, Args&&... args) const
         {
-            auto const symbol = GetFunction<Ret(*)(Args...)>(name);
+            auto const symbol = GetFunction<Ret(Args...)>(name);
 
             if (symbol)
             {
@@ -670,7 +670,7 @@ namespace tw
         template <typename Ret, typename... Args>
         std::optional<Ret> CallOpt(char const* name, Args&&... args) const noexcept
         {
-            auto const symbol = GetFunction<Ret(*)(Args...)>(name);
+            auto const symbol = GetFunction<Ret(Args...)>(name);
 
             if (symbol)
             {
