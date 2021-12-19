@@ -1,61 +1,37 @@
 # TccWrapper
 
-Convenient header-only C++17 wrapper to use with embedded [Tiny C Compiler (tcc)](https://bellard.org/tcc/) from [official repository](https://repo.or.cz/tinycc.git).
+Convenient header-only C++17 wrapper to use with embedded [Tiny C Compiler (tcc)](https://bellard.org/tcc/).
 
 ## Usage
 
-#### Basics
+#### Building library
 
-* script.c
-```c
-extern void HelloWorld();
+Since TccWrapper is a header-only library you only need to build wrapped **tcc** library. To do so:
 
-int main()
-{
-    HelloWorld();
+* Clone code from [official repository](https://repo.or.cz/tinycc.git) or [unofficial GitHub mirror](https://github.com/TinyCC/tinycc).
+* Run `configure` script from main directory.
+* Run `make` command for newly created `Makefile`.
 
-    return 0;
-}
-```
+Now you should have `libtcc` and `libtcc1` (`.a`, `.so`, `.dll` or whatever depending on OS) library files in the main directory.
 
-* main.cpp
-```cpp
-#include <iostream>
+`configure` script has many options to suit your needs with most useful:
 
-#include <TccWrapper.hpp>
+* `--cc=CC` - use C compiler CC
+* `--ar=AR` - create archives using AR
+* `--extra-cflags="FLAGS"` - specify additional compiler flags
+* `--extra-ldflags="FLAGS"` - specify additional linker options
+* `--debug` - include debug info with resulting binaries
+* `--disable-static` - make libtcc.so instead of libtcc.a
+* `--enable-static` - make libtcc.a instead of libtcc.dll (win32)
 
-void HelloWorld()
-{
-    std::cout << "Hello world!" << '\n';
-}
+#### Compiling and running your program
 
-int main()
-{
-    // Create wrapper object
-    auto tcc = tw::TccWrapper::New();
+Everything you need is to link `libtcc` (on non-win32 platforms you may need `dl` and `pthread` too) to your program and put `libtcc1` in the directory of executable (you can add custom directories with `TccWrapper::AddLibraryPath` method).
 
-    // Create context (instance of wrapped tcc)
-    if (!tcc.CreateContext())
-    {
-        std::cerr << "Cannot create valid context" << '\n';
+#### Wiki
 
-        return 1;
-    }
-
-    // Add file with C source code for compilation
-    tcc.AddFile("script.c");
-
-    // Register function for use within script
-    tcc.RegisterFunction("HelloWorld", &HelloWorld);
-
-    // Compile code
-    tcc.Compile();
-
-    // Call 'main' function from C script
-    std::cout << tcc.Call<int>("main") << '\n';
-}
-```
+Please check repo's wiki for any kind of tutorials or examples.
 
 ## License
 
-Just see [license](LICENSE).
+MIT, see [license](LICENSE) for more information.
