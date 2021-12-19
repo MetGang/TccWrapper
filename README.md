@@ -28,7 +28,7 @@ Now you should have `libtcc` and `libtcc1` (`.a`, `.so`, `.dll` or whatever depe
 
 Everything you need is to link `libtcc` (on non-win32 platforms you may need `dl` and `pthread` too) to your program and put `libtcc1` in the directory of executable (you can add custom directories with `TccWrapper::AddLibraryPath` method).
 
-#### Wiki
+## Wiki
 
 Please check repo's wiki for any kind of tutorials or examples.
 
