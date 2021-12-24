@@ -317,7 +317,6 @@ namespace tw
         /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const volatile && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile&&, Ret, Args...> {};
-
     }
 
     /// Convert method pointer to C-like function pointer
