@@ -1,9 +1,7 @@
 /*
-
-    Convenient header-only C++ wrapper for use with embedded Tiny C Compiler
+    Convenient header-only C++17 wrapper to use with embedded Tiny C Compiler (tcc).
 
     Created by Patrick Stritch
-
 */
 
 #pragma once
@@ -82,18 +80,20 @@ namespace tw
 {
     namespace detail
     {
-        ///
+        /// Fallback helper for more readable template error messages
         template <typename...>
         inline constexpr bool alwaysFalse = false;
 
-        ///
+        /// Type-safe reinterpret_cast equivalent that follows type aliasing rules
         template <typename To, typename From>
         To BitCast(From const& src) noexcept
         {
             if constexpr ((sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<From> && std::is_trivial_v<To>)
             {
                 To dst;
+
                 std::memcpy(&dst, &src, sizeof(To));
+
                 return dst;
             }
             else
@@ -102,10 +102,11 @@ namespace tw
             }
         }
 
-        ///
+        /// Helper struct holder for AsFreeFunction method
         template <auto vMethodPtr, bool vIsNoexcept, bool vIsCVariadic, typename Class, typename Ret, typename... Args>
         struct MethodConverterBase
         {
+            /// Convert method pointer to C-like function pointer
             static constexpr auto AsFreeFunction() noexcept
             {
                 if constexpr (vIsCVariadic)
@@ -121,215 +122,216 @@ namespace tw
             }
         };
 
-        ///
+        /// Basic template struct for MethodConverter
         template <typename, auto>
         struct MethodConverter;
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...)` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...), vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) volatile` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) volatile, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class volatile, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const volatile` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const volatile, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const volatile, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...)` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...), vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) volatile` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) volatile, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class volatile, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const volatile` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const volatile, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) &` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const &` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) volatile &` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) volatile &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class volatile&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const volatile &` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const volatile &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const volatile&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) &` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const &` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) volatile &` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) volatile &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class volatile&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const volatile &` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile &, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const volatile&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) &&` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const &&` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) volatile &&` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) volatile &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class volatile&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const volatile &&` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const volatile &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, false, Class const volatile&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) &&` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const &&` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) volatile &&` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) volatile &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class volatile&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const volatile &&` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile &&, vMethodPtr> : MethodConverterBase<vMethodPtr, false, true, Class const volatile&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) volatile noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) volatile noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class volatile, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const volatile noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const volatile noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const volatile, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) volatile noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) volatile noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class volatile, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const volatile noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) & noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const & noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) volatile & noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) volatile & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class volatile&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const volatile & noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const volatile & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const volatile&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) & noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const & noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) volatile & noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) volatile & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class volatile&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const volatile & noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile & noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) volatile && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class volatile&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args...) const volatile && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args...) const volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, false, Class const volatile&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) volatile && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class volatile&&, Ret, Args...> {};
 
-        ///
+        /// MethodConverter specialization for `Ret(Class::*)(Args..., ...) const volatile && noexcept` signature
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile&&, Ret, Args...> {};
 
-        ///
-        template <typename M, M vMethodPtr>
-        constexpr auto AsFreeFunction() noexcept
-        {
-            return MethodConverter<M, vMethodPtr>::AsFreeFunction();
-        }
+    }
 
-        ///
-        template <auto vMethodPtr>
-        constexpr auto AsFreeFunction() noexcept
-        {
-            return AsFreeFunction<decltype(vMethodPtr), vMethodPtr>();
-        }
+    /// Convert method pointer to C-like function pointer
+    template <typename M, M vMethodPtr>
+    constexpr auto AsFreeFunction() noexcept
+    {
+        return detail::MethodConverter<M, vMethodPtr>::AsFreeFunction();
+    }
+
+    /// Convert method pointer to C-like function pointer
+    template <auto vMethodPtr>
+    constexpr auto AsFreeFunction() noexcept
+    {
+        return AsFreeFunction<decltype(vMethodPtr), vMethodPtr>();
     }
 
     /// Enumeration that specifies how compiled code will be outputed
@@ -355,13 +357,13 @@ namespace tw
         using ErrorFunc_t       = TCCErrorFunc;
         using ListSymbolsFunc_t = TCCListSymbolsFunc;
 
-        /// Create invalid (without context) wrapper object
+        /// Create invalid (without state) wrapper object
         static TccWrapper New() noexcept
         {
             return TccWrapper{ nullptr };
         }
 
-        /// Create wrapper object from existing context
+        /// Create wrapper object from existing state
         static TccWrapper From(State_t state)
         {
             return TccWrapper{ state };
@@ -370,8 +372,8 @@ namespace tw
         /// Deleted named-ctor to prevent construction from nullptr
         static TccWrapper From(std::nullptr_t) = delete;
 
-        /// Create wrapper object with valid context or throw on failure
-        static TccWrapper WithContext()
+        /// Create wrapper object with valid state or throw on failure
+        static TccWrapper WithState()
         {
             auto state = tcc_new();
 
@@ -381,12 +383,12 @@ namespace tw
             }
             else
             {
-                throw std::runtime_error("TccWrapper::WithContext() - unable to create tcc context");
+                throw std::runtime_error("TccWrapper::WithState() - unable to create tcc state");
             }
         }
 
-        /// Create optional of wrapper object with valid context or empty optional on failure
-        static std::optional<TccWrapper> WithOptContext() noexcept
+        /// Create optional of wrapper object with valid state or empty optional on failure
+        static std::optional<TccWrapper> OptWithState() noexcept
         {
             auto state = tcc_new();
 
@@ -446,8 +448,8 @@ namespace tw
             }
         }
 
-        /// Create tcc context, return true on success
-        bool CreateContext() noexcept
+        /// Create tcc state, return true on success
+        bool CreateState() noexcept
         {
             if (m_state)
             {
@@ -459,8 +461,8 @@ namespace tw
             return m_state;
         }
 
-        /// Destroy tcc context, return true if it was deleted
-        bool DestroyContext() noexcept
+        /// Destroy tcc state, return true if it was deleted
+        bool DestroyState() noexcept
         {
             if (m_state)
             {
@@ -581,7 +583,7 @@ namespace tw
             return GetSymbol(name) != nullptr;
         }
 
-        /// Invoke function for each symbol registered in the context
+        /// Invoke function for each symbol registered in the state
         void ForEachSymbol(void* userData, ListSymbolsFunc_t function) const noexcept
         {
             tcc_list_symbols(m_state, userData, function);
@@ -621,7 +623,7 @@ namespace tw
         {
             if constexpr (std::is_member_function_pointer_v<M>)
             {
-                RegisterFunction(name, detail::AsFreeFunction<M, vMethodPtr>());
+                RegisterFunction(name, AsFreeFunction<M, vMethodPtr>());
             }
             else
             {
