@@ -1,6 +1,6 @@
 # TccWrapper
 
-Convenient header-only C++17 wrapper to use with embedded [Tiny C Compiler (tcc)](https://bellard.org/tcc/).
+Convenient header-only C++20 wrapper to use with embedded [Tiny C Compiler (tcc)](https://bellard.org/tcc/).
 
 ## Usage
 
