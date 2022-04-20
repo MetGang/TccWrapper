@@ -6,11 +6,7 @@
 
 #pragma once
 
-#if __cplusplus < 202002L
-
-#error TccWrapper requires at least C++20 capable compiler to work
-
-#else
+#if (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L) || __cplusplus >= 202002L
 
 // C++
 #include <bit>
@@ -712,5 +708,9 @@ namespace tw
         State_t m_state;
     };
 }
+
+#else
+
+#error TccWrapper requires at least C++20 capable compiler to work
 
 #endif
