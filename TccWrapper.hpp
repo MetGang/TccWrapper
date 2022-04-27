@@ -1,15 +1,14 @@
 /*
-    Convenient header-only C++20 wrapper to use with embedded Tiny C Compiler (tcc).
+    Convenient header-only C++17 wrapper to use with embedded Tiny C Compiler (tcc).
 
     Created by Patrick Stritch
 */
 
 #pragma once
 
-#if (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L) || __cplusplus >= 202002L
+#if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
 
 // C++
-#include <bit>
 #include <cstring>
 #include <tuple>
 #include <optional>
@@ -83,9 +82,50 @@ namespace tw
 {
     namespace priv
     {
+        namespace traits
+        {
+            /// Trait to recognize if F is a function
+            template <typename F>
+            inline constexpr bool Function_v = std::is_function_v<F>;
+
+            /// Trait to recognize 
+            template <typename FP>
+            inline constexpr bool FunctionPtr_v = std::is_function_v<std::remove_pointer_t<FP>>;
+
+            /// Trait to recognize 
+            template <typename MP>
+            inline constexpr bool MethodPtr_v = std::is_member_function_pointer_v<MP>;
+
+            /// Trait to recognize 
+            template <typename F, typename... Args>
+            inline constexpr bool InvokableWith_v = std::is_invocable_v<F, Args...>;
+
+            /// Trait to recognize 
+            template <typename To, typename From>
+            inline constexpr bool BitCastable_v = (sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<From> && std::is_trivial_v<To>;
+        }
+
         /// Fallback helper for more readable template error messages
         template <typename...>
-        inline constexpr bool alwaysFalse = false;
+        inline constexpr bool error = false;
+
+        /// Type-safe reinterpret_cast equivalent that follows type aliasing rules
+        template <typename To, typename From>
+        To BitCast(From const& src) noexcept
+        {
+            if constexpr (traits::BitCastable_v<To, From>)
+            {
+                To dst;
+
+                std::memcpy(&dst, &src, sizeof(To));
+
+                return dst;
+            }
+            else
+            {
+                static_assert(error<To, From>, "Type requirements to perform bit cast are not met!");
+            }
+        }
 
         /// Helper struct holder for AsFreeFunction method
         template <auto vMethodPtr, bool vIsNoexcept, bool vIsCVariadic, typename Class, typename Ret, typename... Args>
@@ -96,7 +136,7 @@ namespace tw
             {
                 if constexpr (vIsCVariadic)
                 {
-                    static_assert(alwaysFalse<Class>, "C-like variadic arguments in method are not supported!");
+                    static_assert(error<Class>, "C-like variadic arguments in method are not supported!");
                 }
                 else
                 {
@@ -303,39 +343,19 @@ namespace tw
         template <typename Class, typename Ret, typename... Args, auto vMethodPtr>
         struct MethodConverter<Ret(Class::*)(Args..., ...) const volatile && noexcept, vMethodPtr> : MethodConverterBase<vMethodPtr, true, true, Class const volatile&&, Ret, Args...> {};
 
-        namespace cep
+        /// Convert method pointer to C-like function pointer
+        template <typename MP, MP vMethodPtr>
+        constexpr auto AsFreeFunction() noexcept
         {
-            template <typename T>
-            concept Function = std::is_function_v<T>;
-
-            template <typename T>
-            concept FunctionPtr = Function<std::remove_pointer_t<T>>;
-
-            template <typename T>
-            concept MethodPtr = std::is_member_function_pointer_v<T>;
-
-            template <typename T, typename... Ts>
-            concept InvokableWith = Function<T> && std::is_invocable_v<T, Ts...>;
-
-            template <typename U, typename T, typename... Ts>
-            concept InvokableToWith = InvokableWith<T, Ts...> && std::is_assignable_v<U, std::invoke_result_t<T, Ts...>>;
+            return MethodConverter<MP, vMethodPtr>::AsFreeFunction();
         }
-    }
 
-    /// Convert method pointer to C-like function pointer
-    template <typename M, M vMethodPtr>
-        requires priv::cep::MethodPtr<M>
-    constexpr auto AsFreeFunction() noexcept
-    {
-        return priv::MethodConverter<M, vMethodPtr>::AsFreeFunction();
-    }
-
-    /// Convert method pointer to C-like function pointer
-    template <auto vMethodPtr>
-        requires priv::cep::MethodPtr<decltype(vMethodPtr)>
-    constexpr auto AsFreeFunction() noexcept
-    {
-        return AsFreeFunction<decltype(vMethodPtr), vMethodPtr>();
+        /// Convert method pointer to C-like function pointer
+        template <auto vMethodPtr>
+        constexpr auto AsFreeFunction() noexcept
+        {
+            return AsFreeFunction<decltype(vMethodPtr), vMethodPtr>();
+        }
     }
 
     /// Enumeration that specifies how compiled code will be outputed
@@ -431,10 +451,10 @@ namespace tw
             return *this;
         }
 
-        /// Deleted const move-ctor to prevent moving from const
+        /// Deleted const move-ctor to prevent moving from const object
         TccWrapper(TccWrapper const&&) = delete;
 
-        /// Deleted const move-assign-op to prevent moving from const
+        /// Deleted const move-assign-op to prevent moving from const object
         TccWrapper& operator=(TccWrapper const&&) = delete;
 
         /// Destroy tcc state
@@ -456,7 +476,7 @@ namespace tw
 
             m_state = tcc_new();
 
-            return m_state;
+            return m_state != nullptr;
         }
 
         /// Destroy tcc state, return true if it was deleted
@@ -572,10 +592,10 @@ namespace tw
         template <typename T>
         T* GetSymbolAs(char const* name) const noexcept
         {
-            return std::bit_cast<T*>(GetSymbol(name));
+            return priv::BitCast<T*>(GetSymbol(name));
         }
 
-        /// Check whether symbol with given name exists
+        /// Check if symbol with given name exists
         bool HasSymbol(char const* name) const noexcept
         {
             return GetSymbol(name) != nullptr;
@@ -588,16 +608,21 @@ namespace tw
         }
 
         /// Register symbol from parameter as free function with given name, won't override if called multiple times
-        template <typename F>
-            requires priv::cep::Function<F>
-        void RegisterFunction(char const* name, F* functionPtr) const noexcept
+        template <typename FP>
+        void RegisterFunction(char const* name, FP functionPtr) const noexcept
         {
-            tcc_add_symbol(m_state, name, std::bit_cast<void const*>(functionPtr));
+            if constexpr (priv::traits::FunctionPtr_v<FP>)
+            {
+                tcc_add_symbol(m_state, name, priv::BitCast<void const*>(functionPtr));
+            }
+            else
+            {
+                static_assert(priv::error<FP>, "FP is not a function pointer!");
+            }
         }
 
         /// Register symbol as free function with given name, won't override if called multiple times
         template <typename F, F vFunctionPtr>
-            requires priv::cep::FunctionPtr<F>
         void RegisterFunction(char const* name) const noexcept
         {
             RegisterFunction(name, vFunctionPtr);
@@ -605,23 +630,27 @@ namespace tw
 
         /// Register symbol as free function with given name, won't override if called multiple times
         template <auto vFunctionPtr>
-            requires priv::cep::FunctionPtr<decltype(vFunctionPtr)>
         void RegisterFunction(char const* name) const noexcept
         {
             RegisterFunction(name, vFunctionPtr);
         }
 
         /// Register symbol as class method with given name, won't override if called multiple times
-        template <typename M, M vMethodPtr>
-            requires priv::cep::MethodPtr<M>
+        template <typename MP, MP vMethodPtr>
         void RegisterMethod(char const* name) const noexcept
         {
-            RegisterFunction(name, AsFreeFunction<M, vMethodPtr>());
+            if constexpr (priv::traits::MethodPtr_v<MP>)
+            {
+                RegisterFunction(name, priv::AsFreeFunction<MP, vMethodPtr>());
+            }
+            else
+            {
+                static_assert(priv::error<MP>, "MP is not a method pointer!");
+            }
         }
 
         /// Register symbol as class method with given name, won't override if called multiple times
         template <auto vMethodPtr>
-            requires priv::cep::MethodPtr<decltype(vMethodPtr)>
         void RegisterMethod(char const* name) const noexcept
         {
             RegisterMethod<decltype(vMethodPtr), vMethodPtr>(name);
@@ -629,57 +658,44 @@ namespace tw
 
         /// Return F pointer to function with given name or nullptr if no such symbol exists
         template <typename F>
-            requires priv::cep::Function<F>
         auto GetFunction(char const* name) const noexcept
         {
-            return GetSymbolAs<F>(name);
+            if constexpr (priv::traits::Function_v<F>)
+            {
+                return GetSymbolAs<F>(name);
+            }
+            else
+            {
+                static_assert(priv::error<F>, "F is not a function!");
+            }
         }
 
         /// Try to invoke function with given args, return result, throw if no such function symbol exists
         template <typename F, typename... Args>
-            requires priv::cep::InvokableWith<F, Args...>
-        std::invoke_result_t<F, Args...> Invoke(char const* name, Args&&... args) const
+        auto Invoke(char const* name, Args&&... args) const
         {
-            auto const symbol = GetFunction<F>(name);
-
-            if (symbol)
+            if constexpr (priv::traits::Function_v<F>)
             {
-                return (*symbol)(std::forward<Args>(args)...);
+                if constexpr (priv::traits::InvokableWith_v<F, Args...>)
+                {
+                    auto const symbol = GetFunction<F>(name);
+
+                    if (symbol != nullptr)
+                    {
+                        return (*symbol)(std::forward<Args>(args)...);
+                    }
+
+                    throw std::runtime_error(std::string{ "TccWrapper::Invoke() - unable to find symbol with given name: " } + name);
+                }
+                else
+                {
+                    static_assert(priv::error<F, Args...>, "F is not invokable with given Args!");
+                }
             }
-
-            throw std::runtime_error(std::string{ "TccWrapper::Invoke() - unable to find symbol with given name: " } + name);
-        }
-
-        /// Try to invoke function with given args, return optional with invoke result
-        template <typename F, typename... Args>
-            requires priv::cep::InvokableWith<F, Args...>
-        std::optional<std::invoke_result_t<F, Args...>> OptInvoke(char const* name, Args&&... args) const
-        {
-            auto const symbol = GetFunction<F>(name);
-
-            if (symbol)
+            else
             {
-                return (*symbol)(std::forward<Args>(args)...);
+                static_assert(priv::error<F>, "F is not a function!");
             }
-
-            return std::nullopt;
-        }
-
-        /// Try to invoke function with given args, store result in output argument, return true on success
-        template <typename F, typename R, typename... Args>
-            requires priv::cep::InvokableToWith<R&, F, Args...>
-        bool SafeInvoke(char const* name, R& result, Args&&... args) const
-        {
-            auto const symbol = GetFunction<F>(name);
-
-            if (symbol)
-            {
-                result = (*symbol)(std::forward<Args>(args)...);
-
-                return true;
-            }
-
-            return false;
         }
 
         /// Output file depending on outputType, return true on success
@@ -694,6 +710,12 @@ namespace tw
         State_t GetState() const noexcept
         {
             return m_state;
+        }
+
+        /// Return if internal state is valid (is not nullptr)
+        bool IsValid() const noexcept
+        {
+            return GetState() != nullptr;
         }
 
     private:
@@ -711,6 +733,6 @@ namespace tw
 
 #else
 
-#error TccWrapper requires at least C++20 capable compiler to work
+#error TccWrapper requires at least C++17 capable compiler to work
 
 #endif
