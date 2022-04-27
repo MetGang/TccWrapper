@@ -715,7 +715,7 @@ namespace tw
         /// Return if internal state is valid (is not nullptr)
         bool IsValid() const noexcept
         {
-            return GetState() != nullptr;
+            return m_state != nullptr;
         }
 
     private:
