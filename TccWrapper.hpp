@@ -29,9 +29,9 @@ extern "C"
 
     typedef struct TCCState TCCState;
 
-    typedef void (*TCCErrorFunc)(void* userData, char const* msg);
+    typedef void(*TCCErrorFunc)(void* userData, char const* msg);
 
-    typedef void (*TCCListSymbolsFunc)(void* userData, char const* name, void const* value);
+    typedef void(*TCCListSymbolsFunc)(void* userData, char const* name, void const* value);
 
     TCCState* tcc_new(void);
 
@@ -381,7 +381,7 @@ namespace tw
             return TccWrapper{ nullptr };
         }
 
-        /// Create wrapper object from existing state
+        /// Create wrapper object from (possibly) existing state
         static TccWrapper From(State_t state)
         {
             return TccWrapper{ state };
@@ -399,10 +399,8 @@ namespace tw
             {
                 return TccWrapper{ state };
             }
-            else
-            {
-                throw std::runtime_error("TccWrapper::WithState() - unable to create tcc state");
-            }
+
+            throw std::runtime_error("TccWrapper::WithState() - unable to create tcc state");
         }
 
         /// Create optional of wrapper object with valid state or empty optional on failure
@@ -414,10 +412,8 @@ namespace tw
             {
                 return TccWrapper{ state };
             }
-            else
-            {
-                return std::nullopt;
-            }
+
+            return std::nullopt;
         }
 
         /// Deleted const copy-ctor
@@ -466,7 +462,7 @@ namespace tw
             }
         }
 
-        /// Create tcc state, return true on success
+        /// Create (or recreate) tcc state, return true on success
         bool CreateState() noexcept
         {
             if (m_state)
@@ -706,16 +702,16 @@ namespace tw
             return tcc_output_file(m_state, filename) != -1;
         }
 
-        /// Return internal state on which wrapper operates
-        State_t GetState() const noexcept
-        {
-            return m_state;
-        }
-
         /// Return if internal state is valid (is not nullptr)
         bool IsValid() const noexcept
         {
             return m_state != nullptr;
+        }
+
+        /// Return internal state on which wrapper operates
+        State_t GetState() const noexcept
+        {
+            return m_state;
         }
 
     private:
