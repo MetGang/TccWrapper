@@ -1,6 +1,9 @@
 /*
     Convenient header-only C++17 wrapper to use with embedded Tiny C Compiler (tcc).
 
+    Define TW_USE_EXCEPTIONS to use WithState/Invoke methods
+    Define TW_USE_OPTIONAL to use OptWithSate method
+
     Created by Patrick Stritch
 */
 
@@ -9,11 +12,18 @@
 #if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
 
 // C++
+#include <cstdint>
 #include <cstring>
-#include <tuple>
-#include <optional>
+#include <utility>
+
+#if defined(TW_USE_EXCEPTIONS)
 #include <stdexcept>
 #include <string>
+#endif
+
+#if defined(TW_USE_OPTIONAL)
+#include <optional>
+#endif
 
 extern "C"
 {
@@ -390,6 +400,8 @@ namespace tw
         /// Deleted named-ctor to prevent construction from nullptr
         static TccWrapper From(std::nullptr_t) = delete;
 
+        #if defined(TW_USE_EXCEPTIONS)
+
         /// Create wrapper object with valid state or throw on failure
         static TccWrapper WithState()
         {
@@ -403,6 +415,10 @@ namespace tw
             throw std::runtime_error("TccWrapper::WithState() - unable to create tcc state");
         }
 
+        #endif
+
+        #if defined(TW_USE_OPTIONAL)
+
         /// Create optional of wrapper object with valid state or empty optional on failure
         static std::optional<TccWrapper> OptWithState()
         {
@@ -415,6 +431,8 @@ namespace tw
 
             return std::nullopt;
         }
+
+        #endif
 
         /// Deleted const copy-ctor
         TccWrapper(TccWrapper const&) = delete;
@@ -666,6 +684,8 @@ namespace tw
             }
         }
 
+        #if defined(TW_USE_EXCEPTIONS)
+
         /// Try to invoke function with given args, return result, throw if no such function symbol exists
         template <typename F, typename... Args>
         auto Invoke(char const* name, Args&&... args) const
@@ -693,6 +713,8 @@ namespace tw
                 static_assert(priv::error<F>, "F is not a function!");
             }
         }
+
+        #endif
 
         /// Output file depending on outputType, return true on success
         bool OutputFile(char const* filename, OutputType outputType) const noexcept

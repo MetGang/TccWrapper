@@ -8,7 +8,7 @@ Please refer to repository wiki or comments in [TccWrapper.hpp](TccWrapper.hpp) 
 
 ## Availability
 
-TccWrapper requires at least C++17 capable compiler to work. Check [live preview](https://godbolt.org/z/jfKofW6sr) for list of available compilers and their minimal supported versions. List may not be 100% accurate!
+TccWrapper requires at least C++17 capable compiler to work. Check [live preview](https://godbolt.org/z/dWdGxrYjh) for list of available compilers and their minimal supported versions. List may not be 100% accurate!
 
 ## License
 
