@@ -98,19 +98,19 @@ namespace tw
             template <typename F>
             inline constexpr bool Function_v = std::is_function_v<F>;
 
-            /// Trait to recognize 
+            /// Trait to recognize if FP is a function pointer
             template <typename FP>
             inline constexpr bool FunctionPtr_v = std::is_function_v<std::remove_pointer_t<FP>>;
 
-            /// Trait to recognize 
+            /// Trait to recognize if MP is a method (member function) pointer
             template <typename MP>
             inline constexpr bool MethodPtr_v = std::is_member_function_pointer_v<MP>;
 
-            /// Trait to recognize 
+            /// Trait to recognize if F is invokable with Args...
             template <typename F, typename... Args>
             inline constexpr bool InvokableWith_v = std::is_invocable_v<F, Args...>;
 
-            /// Trait to recognize 
+            /// Trait to recognize if From is bit-castable to To
             template <typename To, typename From>
             inline constexpr bool BitCastable_v = (sizeof(To) == sizeof(From)) && std::is_trivially_copyable_v<From> && std::is_trivial_v<To>;
         }
