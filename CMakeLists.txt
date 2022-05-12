@@ -9,6 +9,6 @@ project(TccWrapper
 
 add_library(TccWrapper INTERFACE)
 
-target_include_directories(TccWrapper INTERFACE .)
+target_include_directories(TccWrapper INTERFACE include/)
 
 target_compile_features(TccWrapper INTERFACE cxx_std_17)
