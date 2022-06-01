@@ -716,6 +716,33 @@ namespace tw
 
         #endif
 
+        #if defined(TW_USE_OPTIONAL)
+
+        /// Try to invoke function with given args, return optional with call result (with value or empty)
+        template <typename F, typename... Args>
+        auto OptInvoke(char const* name, Args&&... args) const
+        {
+            if constexpr (priv::traits::Function_v<F>)
+            {
+                if constexpr (priv::traits::InvokableWith_v<F, Args...>)
+                {
+                    auto const symbol = GetFunction<F>(name);
+
+                    return symbol != nullptr ? std::make_optional((*symbol)(std::forward<Args>(args)...)) : std::nullopt;
+                }
+                else
+                {
+                    static_assert(priv::error<F, Args...>, "F is not invokable with given Args!");
+                }
+            }
+            else
+            {
+                static_assert(priv::error<F>, "F is not a function!");
+            }
+        }
+
+        #endif
+
         /// Output file depending on outputType, return true on success
         bool OutputFile(char const* filename, OutputType outputType) const noexcept
         {
