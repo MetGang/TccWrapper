@@ -4,7 +4,7 @@ Convenient header-only C++17 wrapper to use with embedded [Tiny C Compiler (tcc)
 
 ## Usage
 
-Please refer to repository `docs` directory or comments in [TccWrapper.hpp](include/TccWrapper.hpp) for any kind of help.
+Please refer to repository [documentation](documentation/) directory or comments in [TccWrapper.hpp](include/TccWrapper.hpp) for any kind of help.
 
 #### Very quick start
 
