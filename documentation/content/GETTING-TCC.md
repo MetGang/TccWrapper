@@ -1,6 +1,6 @@
 # Getting tcc
 
-## Building
+### Building
 
 To build underlyling tcc library follow these 3 simple steps:
 
@@ -61,7 +61,7 @@ Advanced options (experts only):
   --config-predefs=no      do not compile tccdefs.h, instead just include
 ```
 
-## Linking
+### Linking
 
 After building tcc you are presented with `libtcc` and `libtcc1` files.
 

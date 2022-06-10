@@ -2,7 +2,7 @@
 
 TccWrapper provides variety ways to be instantiated. Instead of traditional constructors you are presented with Rust-like object creation where static methods are called to return the wrapper object.
 
-## Empty wrapper
+### Empty wrapper
 
 You can create empty (invalid) wrapper to postpone state creation.
 
@@ -19,7 +19,7 @@ if (!wrapper.CreateState())
 }
 ```
 
-## With state
+### With state
 
 State can be created within wrapper creation. Throws on failure.
 
@@ -27,7 +27,7 @@ State can be created within wrapper creation. Throws on failure.
 auto wrapper = tw::TccWrapper::WithState();
 ```
 
-## As `std::optional` with state
+### As `std::optional` with state
 
 State can be created within wrapper creation. Returns empty optional on failure.
 
@@ -40,7 +40,7 @@ if (!wrapper)
 }
 ```
 
-## From existing state
+### From existing state
 
 You can also create wrapper from existing TCCState state which will be further managed by the wrapper. Remember that TccWrapper won't check whether sent state is a valid one.
 
@@ -50,7 +50,7 @@ TCCState* state = tcc_new();
 auto wrapper = tw::TccWrapper::From(state);
 ```
 
-## From `nullptr`
+### From `nullptr`
 
 Won't compile.
 

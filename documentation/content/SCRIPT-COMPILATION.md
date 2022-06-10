@@ -1,11 +1,17 @@
-## With auto managed memory
+# Script compilation
 
-Simply invoke `TccWrapper::Compile` to let tcc take care of all the work.
+TccWrapper provides 2 basic ways to compile scripts.
+
+### With auto managed memory
+
+Simply invoke `TccWrapper::Compile` to let tcc take care of all the work. By default underlying tcc will use `malloc` to allocate code buffer.
 ```cpp
 wrapper.Compile();
 ```
 
-## With user managed buffer
+### With user managed buffer
+
+Take care of code buffer by yourself.
 
 ```cpp
 auto size = wrapper.GetCodeSize();
