@@ -42,7 +42,7 @@ if (!wrapper)
 
 ### From existing state
 
-You can also create wrapper from existing TCCState state which will be further managed by the wrapper. Remember that TccWrapper won't check whether sent state is a valid one.
+You can also create wrapper from existing TCCState state which will be further managed by the wrapper. Remember that TccWrapper won't check whether given state is a valid one.
 
 ```cpp
 TCCState* state = tcc_new();

@@ -2,7 +2,7 @@
 
 ### Building
 
-To build underlyling tcc library follow these 3 simple steps:
+To build underlying tcc library follow these 3 simple steps:
 
 * Clone code from [official repository](https://repo.or.cz/tinycc.git) or [unofficial GitHub mirror](https://github.com/TinyCC/tinycc).
 * Run `configure` script (look below for available options).
@@ -67,4 +67,4 @@ After building tcc you are presented with `libtcc` and `libtcc1` files.
 
 `libtcc` needs to be linked to your main program. On some non-win32 platforms linking additionally `dl` and/or `pthread` may be required.
 
-`libtcc1` is linked internally by tcc while compiling scripts. You can add linking directories with `tcc_add_library_path` or `TccWrapper::AddLibraryPath`.
+`libtcc1` is linked internally by tcc while compiling scripts. You can add linking directories with `TccWrapper::AddLibraryPath`.
