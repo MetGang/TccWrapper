@@ -11,6 +11,11 @@
 
 #if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
 
+#define TW_VERSION_MAJOR      2
+#define TW_VERSION_MINOR      0
+#define TW_VERSION_PATCH      0
+#define TW_VERSION_IS_RELEASE true
+
 // C++
 #include <cstdint>
 #include <cstring>
