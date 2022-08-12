@@ -1,10 +1,12 @@
 # Script compilation
 
+Script source can be added via `TccWrapper::AddFile` from external file or via `TccWrapper::AddSourceCode` from null-terminated string.
+
 TccWrapper provides 2 basic ways to compile scripts.
 
 ### With auto managed memory
 
-Simply invoke `TccWrapper::Compile` to let tcc take care of all the work. By default tcc will use `malloc` to allocate code buffer.
+Simply invoke `TccWrapper::Compile` and let tcc to take care of all the work. By default tcc will use `malloc` to allocate code buffer.
 
 ```cpp
 wrapper.Compile();
