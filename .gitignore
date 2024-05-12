@@ -1,7 +1,11 @@
 .vs
 .vscode
+.cache
 sandbox
 
+*.a
 *.exe
 *.out
 *.app
+
+compile_commands.json
