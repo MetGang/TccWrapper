@@ -2,7 +2,7 @@
     Convenient header-only C++17 wrapper to use with embedded Tiny C Compiler (tcc).
 
     Define TW_USE_EXCEPTIONS to use WithState/Invoke methods
-    Define TW_USE_OPTIONAL to use OptWithSate method
+    Define TW_USE_OPTIONAL to use OptWithSate/OptInvoke methods
 
     Created by Patrick Stritch
 */
@@ -12,7 +12,7 @@
 #if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
 
 #define TW_VERSION_MAJOR      2
-#define TW_VERSION_MINOR      0
+#define TW_VERSION_MINOR      1
 #define TW_VERSION_PATCH      0
 #define TW_VERSION_IS_RELEASE true
 
@@ -37,59 +37,35 @@ extern "C"
     #define TCC_OUTPUT_DLL        3
     #define TCC_OUTPUT_OBJ        4
     #define TCC_OUTPUT_PREPROCESS 5
-
     #define TCC_RELOCATE_AUTO     (void*)1
 
     struct TCCState;
-
     typedef struct TCCState TCCState;
 
     typedef void(*TCCErrorFunc)(void* userData, char const* msg);
-
     typedef void(*TCCListSymbolsFunc)(void* userData, char const* name, void const* value);
 
     TCCState* tcc_new(void);
-
     void tcc_delete(TCCState* state);
-
     void tcc_set_lib_path(TCCState* state, char const* path);
-
     void tcc_set_error_func(TCCState* state, void* userData, TCCErrorFunc function);
-
     TCCErrorFunc tcc_get_error_func(TCCState* state);
-
     void* tcc_get_error_opaque(TCCState* state);
-
     void tcc_set_options(TCCState* state, char const* options);
-
     int tcc_add_include_path(TCCState* state, char const* path);
-
     int tcc_add_sysinclude_path(TCCState* state, char const* path);
-
     void tcc_define_symbol(TCCState* state, char const* symbol, char const* value);
-
     void tcc_undefine_symbol(TCCState* state, char const* symbol);
-
     int tcc_add_file(TCCState* state, char const* filename);
-
     int tcc_compile_string(TCCState* state, char const* src);
-
     int tcc_set_output_type(TCCState* state, int outputType);
-
     int tcc_add_library_path(TCCState* state, char const* path);
-
     int tcc_add_library(TCCState* state, char const* name);
-
     int tcc_add_symbol(TCCState* state, char const* name, void const* ptr);
-
     int tcc_output_file(TCCState* state, char const* filename);
-
     int tcc_run(TCCState* state, int argc, char** argv);
-
     int tcc_relocate(TCCState* state, void* ptr);
-
     void* tcc_get_symbol(TCCState* state, char const* name);
-
     void tcc_list_symbols(TCCState* state, void* userData, TCCListSymbolsFunc function);
 }
 
@@ -131,9 +107,7 @@ namespace tw
             if constexpr (traits::BitCastable_v<To, From>)
             {
                 To dst;
-
                 std::memcpy(&dst, &src, sizeof(To));
-
                 return dst;
             }
             else
@@ -756,7 +730,7 @@ namespace tw
             return tcc_output_file(m_state, filename) != -1;
         }
 
-        /// Return if internal state is valid (is not nullptr)
+        /// Return true if internal state is valid (is not nullptr)
         bool IsValid() const noexcept
         {
             return m_state != nullptr;
