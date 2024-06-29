@@ -12,7 +12,7 @@ else
 	LIBS = -ltcc -ldl -lpthread
 endif
 
-all: hello
+all: hello hello2 error fibonacci
 
 hello:
 	$(CXX) -o Hello Hello.cpp $(CXX_FLAGS) $(IDIR) $(LDIR) $(LIBS)
@@ -25,6 +25,12 @@ hello2:
 
 run-hello2: hello2
 	@ ./Hello2
+
+error:
+	$(CXX) -o Error Error.cpp $(CXX_FLAGS) $(IDIR) $(LDIR) $(LIBS)
+
+run-error: error
+	@ ./Error
 
 fibonacci:
 	$(CXX) -o Fibonacci Fibonacci.cpp $(CXX_FLAGS) $(IDIR) $(LDIR) $(LIBS)
