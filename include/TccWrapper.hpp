@@ -528,7 +528,7 @@ namespace tw
             return tcc_compile_string(m_state, src) != -1;
         }
 
-        /// Compile code to auto managed memory, return true on success, call only once
+        /// Compile code to auto managed memory, return true on successful allocation, call only once
         bool compile() const noexcept
         {
             tcc_set_output_type(m_state, TCC_OUTPUT_MEMORY);
