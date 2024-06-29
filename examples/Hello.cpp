@@ -6,9 +6,7 @@ auto main() -> int
 
     tcc.create_state();
 
-    tcc.add_library_path("lib");
-
-    tcc.add_file("basic.c");
+    tcc.add_file("hello.c");
 
     tcc.compile();
 

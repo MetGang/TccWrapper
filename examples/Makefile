@@ -12,13 +12,13 @@ else
 	LIBS = -ltcc -ldl -lpthread
 endif
 
-all: basic
+all: hello
 
-basic:
-	$(CXX) -o Basic Basic.cpp $(CXX_FLAGS) $(IDIR) $(LDIR) $(LIBS)
+hello:
+	$(CXX) -o Hello Hello.cpp $(CXX_FLAGS) $(IDIR) $(LDIR) $(LIBS)
 
-run-basic: basic
-	./Basic
+run-hello: hello
+	@ ./Hello
 
 compiledb:
 	compiledb --command-style --full-path --no-build make
