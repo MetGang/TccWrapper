@@ -20,5 +20,17 @@ hello:
 run-hello: hello
 	@ ./Hello
 
+hello2:
+	$(CXX) -o Hello2 Hello2.cpp $(CXX_FLAGS) $(IDIR) $(LDIR) $(LIBS)
+
+run-hello2: hello2
+	@ ./Hello2
+
+fibonacci:
+	$(CXX) -o Fibonacci Fibonacci.cpp $(CXX_FLAGS) $(IDIR) $(LDIR) $(LIBS)
+
+run-fibonacci: fibonacci
+	@ ./Fibonacci
+
 compiledb:
 	compiledb --command-style --full-path --no-build make
