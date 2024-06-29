@@ -373,8 +373,8 @@ namespace tw
     {
     public:
 
-        using State_t     = TCCState*;
-        using ErrorFunc_t = void (*)(void* opaque, char const* msg);
+        using State_t   = TCCState*;
+        using ErrorFn_t = void (*)(void* user_data, char const* msg);
 
         /// Create wrapper object from (possibly) existing state
         static TccWrapper from(State_t state)
@@ -481,9 +481,9 @@ namespace tw
         }
 
         /// Set function for printing error messages
-        void set_error_callback(void* userData, ErrorFunc_t function) const noexcept
+        void set_error_callback(void* user_data, ErrorFn_t fn) const noexcept
         {
-            tcc_set_error_func(m_state, userData, function);
+            tcc_set_error_func(m_state, user_data, fn);
         }
 
         /// Set options as from command line (like "-std=c99 -O2")
@@ -575,11 +575,11 @@ namespace tw
 
         /// Register symbol from parameter as free function with given name, won't override if called multiple times
         template <typename FP>
-        void register_function(char const* name, FP functionPtr) const noexcept
+        void register_function(char const* name, FP fn) const noexcept
         {
             if constexpr (priv::traits::FunctionPtr_v<FP>)
             {
-                tcc_add_symbol(m_state, name, priv::bit_cast<void const*>(functionPtr));
+                tcc_add_symbol(m_state, name, priv::bit_cast<void const*>(fn));
             }
             else
             {
@@ -695,10 +695,10 @@ namespace tw
 
         #endif
 
-        /// Output file depending on outputType, return true on success
-        bool output_file(char const* filename, OutputType outputType) const noexcept
+        /// Output file depending on output_type, return true on success
+        bool output_file(char const* filename, OutputType output_type) const noexcept
         {
-            tcc_set_output_type(m_state, static_cast<int32_t>(outputType));
+            tcc_set_output_type(m_state, static_cast<int32_t>(output_type));
 
             return tcc_output_file(m_state, filename) != -1;
         }
