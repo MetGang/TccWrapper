@@ -1,16 +1,16 @@
-#define TW_USE_EXCEPTIONS
-#define TW_USE_OPTIONAL
 #include <TccWrapper.hpp>
 
 auto main() -> int
 {
-    auto tcc = tw::TccWrapper::WithState();
+    auto tcc = tw::TccWrapper{};
 
-    tcc.AddLibraryPath("lib");
+    tcc.create_state();
 
-    tcc.AddFile("basic.c");
+    tcc.add_library_path("lib");
 
-    tcc.Compile();
+    tcc.add_file("basic.c");
 
-    return tcc.Invoke<int()>("main");
+    tcc.compile();
+
+    return tcc.invoke<int()>("main");
 }

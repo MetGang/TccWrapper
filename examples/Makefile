@@ -1,7 +1,9 @@
 CXX = g++
-CXX_FLAGS = -std=c++17 -O2 -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wcast-align -Wunused -Woverloaded-virtual -Wconversion -Wsign-conversion -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast -Wdouble-promotion -Wformat=2
+CXX_FLAGS = -DTW_USE_EXCEPTIONS -DTW_USE_OPTIONAL -std=c++17 -O2 -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wcast-align -Wunused -Woverloaded-virtual -Wconversion -Wsign-conversion -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference -Wuseless-cast -Wdouble-promotion -Wformat=2 -Wp,-w
 
-IDIR = -I../include
+TCC_IDIR = -ID:/Dev/Repositories/tinycc
+
+IDIR = -I../include $(TCC_IDIR)
 LDIR = -Llib
 
 ifeq ($(OS), Windows_NT)
