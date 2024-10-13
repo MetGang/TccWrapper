@@ -1,14 +1,14 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required( VERSION 3.12 )
 
-project(TccWrapper
+project( TccWrapper
     VERSION 1.0.0
     LANGUAGES CXX
     DESCRIPTION "Convenient header-only C++17 wrapper to use with embedded Tiny C Compiler (tcc)."
     HOMEPAGE_URL "https://github.com/MetGang/TccWrapper"
 )
 
-add_library(TccWrapper INTERFACE)
+target_compile_features( TccWrapper INTERFACE cxx_std_17 )
 
-target_include_directories(TccWrapper INTERFACE include/)
+target_include_directories( TccWrapper INTERFACE "include/" )
 
-target_compile_features(TccWrapper INTERFACE cxx_std_17)
+add_library( TccWrapper INTERFACE )
